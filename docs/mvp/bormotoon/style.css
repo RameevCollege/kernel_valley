@@ -1,0 +1,498 @@
+:root {
+  --blue: #7199f1;
+  --blue2: #83a3f1;
+  --lime: #effe74;
+  --paper: #f4f5f7;
+  --ink: #222222;
+  --white: #ffffff;
+  --muted: #4f5b72;
+  --line: #d4dced;
+  --soft: #e5ecfa;
+  color-scheme: light;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Trebuchet MS", Arial, sans-serif;
+}
+[hidden] {
+  display: none !important;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+}
+button:focus-visible,
+canvas:focus-visible {
+  outline: 3px solid #2149a1;
+  outline-offset: 3px;
+}
+button {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--white);
+  padding: 10px 14px;
+  min-height: 42px;
+  color: var(--ink);
+}
+button:hover {
+  background: var(--soft);
+}
+button[aria-pressed="true"],
+.primary {
+  background: var(--lime);
+  border-color: var(--ink);
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+#game {
+  max-width: 1500px;
+  padding: 26px 34px 14px;
+  margin: auto;
+}
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.identity img {
+  width: 82px;
+  height: auto;
+}
+h1 {
+  font-size: 28px;
+  letter-spacing: -1.2px;
+  line-height: 1.1;
+  margin: 0;
+}
+h1 span {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0;
+  font-weight: 400;
+  margin-top: 5px;
+  color: var(--muted);
+}
+nav {
+  display: flex;
+  gap: 8px;
+}
+nav button {
+  font-size: 13px;
+  background: transparent;
+}
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 286px;
+  gap: 30px;
+  align-items: start;
+}
+.world-panel {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.resource-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 15px 20px;
+}
+.resource-bar span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.resource-bar b {
+  display: block;
+  color: var(--ink);
+  font-size: 20px;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.canvas-wrap {
+  position: relative;
+  background: #d5e0f8;
+}
+#world {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  touch-action: manipulation;
+}
+#pause-banner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #222222a6;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  pointer-events: none;
+}
+.world-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  padding: 10px 14px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
+.action-bar {
+  display: flex;
+  gap: 6px;
+  padding: 12px;
+  flex-wrap: wrap;
+}
+.action-bar button {
+  flex: 1;
+  font-size: 12px;
+  padding: 10px 8px;
+  white-space: nowrap;
+}
+.action-bar small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+kbd {
+  font-size: 10px;
+  display: inline-block;
+  color: var(--muted);
+  margin-left: 3px;
+}
+.badge {
+  display: inline-block;
+  background: var(--lime);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+h2 {
+  font-size: 32px;
+  line-height: 1.12;
+  letter-spacing: -1px;
+  margin: 16px 0 12px;
+}
+.mission-intro p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+.quests {
+  padding: 0;
+  list-style: none;
+  margin: 22px 0;
+  counter-reset: mission;
+}
+.quests li {
+  position: relative;
+  padding: 12px 0 12px 34px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.4;
+  counter-increment: mission;
+}
+.quests li:before {
+  content: counter(mission);
+  position: absolute;
+  left: 0;
+  top: 12px;
+  border: 1px solid var(--line);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+.quests li.done:before {
+  content: "✓";
+  background: var(--lime);
+  border-color: transparent;
+}
+.quests li b {
+  display: block;
+}
+.quests li small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 3px;
+}
+.journal {
+  background: var(--soft);
+  padding: 16px;
+  border-left: 3px solid var(--blue);
+  min-height: 120px;
+}
+.journal h3 {
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+.journal p {
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+}
+.save-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 20px;
+}
+.save-row span {
+  font-size: 10px;
+  color: var(--muted);
+}
+.save-row button {
+  font-size: 11px;
+  white-space: nowrap;
+}
+.quiet {
+  font-size: 11px;
+  background: transparent;
+  border: 0;
+  padding-left: 0;
+  text-decoration: underline;
+  color: var(--muted);
+}
+footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 18px;
+}
+dialog {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 540px;
+  width: calc(100% - 32px);
+  max-height: 85dvh;
+  overflow: auto;
+  box-shadow: 0 24px 80px #22222240;
+  color: var(--ink);
+  background: var(--white);
+}
+dialog::backdrop {
+  background: #222222a0;
+}
+.close-modal {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  border: 0;
+  background: transparent;
+  font-size: 24px;
+  padding: 0;
+  width: 40px;
+}
+dialog h2 {
+  padding-right: 25px;
+  font-size: 28px;
+}
+dialog p,
+dialog li {
+  font-size: 14px;
+  line-height: 1.65;
+}
+dialog .options {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+dialog .options button {
+  text-align: left;
+  line-height: 1.4;
+}
+dialog .feedback {
+  padding: 12px;
+  background: var(--soft);
+  border-radius: 6px;
+}
+.dialog-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.drawing {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  width: 256px;
+  height: 256px;
+  max-width: 100%;
+  margin: 18px auto;
+  border: 2px solid var(--ink);
+  touch-action: none;
+}
+.drawing button {
+  border: 1px solid #22222220;
+  border-radius: 0;
+  min-height: 0;
+  padding: 0;
+  aspect-ratio: 1;
+}
+.palette {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.palette button {
+  min-width: 44px;
+}
+.touch-controls {
+  display: none;
+  text-align: center;
+  padding: 0 12px 12px;
+}
+.touch-controls button {
+  width: 52px;
+  margin: 2px;
+  touch-action: none;
+  user-select: none;
+}
+@media (max-width: 1100px) {
+  #game {
+    padding: 18px;
+  }
+  .game-layout {
+    grid-template-columns: minmax(0, 1fr) 245px;
+    gap: 18px;
+  }
+  h2 {
+    font-size: 28px;
+  }
+  .identity {
+    gap: 12px;
+  }
+  .identity img {
+    width: 65px;
+  }
+}
+@media (max-width: 820px) {
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+  .masthead {
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .identity img {
+    width: 60px;
+  }
+  h1 {
+    font-size: 25px;
+  }
+  nav {
+    width: 100%;
+  }
+  nav button {
+    flex: 1;
+  }
+  aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .quests {
+    grid-row: span 2;
+    margin: 0;
+  }
+  .save-row {
+    margin: 0;
+  }
+  .journal {
+    min-height: 0;
+  }
+  .touch-controls {
+    display: block;
+  }
+  footer {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .world-caption span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 460px) {
+  #game {
+    padding: 10px;
+  }
+  .resource-bar {
+    padding: 12px;
+    gap: 5px;
+  }
+  .resource-bar span {
+    font-size: 10px;
+  }
+  .resource-bar b {
+    font-size: 17px;
+  }
+  .action-bar {
+    gap: 5px;
+    padding: 8px;
+  }
+  .action-bar button {
+    flex: 1 1 28%;
+    min-height: 44px;
+  }
+  .action-bar kbd {
+    display: none;
+  }
+  aside {
+    display: block;
+  }
+  aside > * {
+    margin-top: 18px !important;
+  }
+  .mission-intro h2 br {
+    display: none;
+  }
+  .quests {
+    margin: 18px 0;
+  }
+  .drawing {
+    width: 240px;
+    height: 240px;
+  }
+  dialog {
+    padding: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+/* Keep the map and primary actions together on desktop-height screens. */
+@media (min-width: 821px) {
+  #game {
+    max-width: 1260px;
+  }
+  #world {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: max(360px, calc(100dvh - 285px));
+    margin: 0 auto;
+  }
+}

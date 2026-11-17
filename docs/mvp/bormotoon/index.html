@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#222222"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%237199F1%27/%3E%3Cpath d=%27M8 10h16v12H8z%27 fill=%27%23222222%27/%3E%3Cpath d=%27M11 13h3v3h-3zm7 0h3v3h-3z%27 fill=%27%23EFFE74%27/%3E%3C/svg%3E"><title>Kernel Valley — Урожай багов</title><link rel="stylesheet" href="loader.css"><link rel="stylesheet" href="style.css"></head>
+<body>
+<main id="game" hidden>
+<header class="masthead"><div class="identity"><img src="assets/logo.webp" alt="Цифровой колледж имени Башира Рамеева"><div><h1>Kernel Valley<span>Урожай багов</span></h1></div></div><nav aria-label="Настройки игры"><button id="sound" aria-pressed="false">Звук: выкл.</button><button id="help">Как играть</button><button id="pause">Пауза</button></nav></header>
+<div class="game-layout"><section class="world-panel" aria-label="Кибердеревня">
+<div class="resource-bar" aria-label="Ресурсы"><span>Прочность <b id="health">6 / 6</b></span><span>Кредиты <b id="credits">24</b></span><span>Кукуруза <b id="corn">0</b></span><span>Патчи <b id="patches">0</b></span></div>
+<div class="canvas-wrap"><canvas id="world" width="768" height="576" tabindex="0" aria-label="Карта деревни. Стрелки или WASD — ходить, E — взаимодействовать, пробел — удар. Также можно нажимать на объекты карты."></canvas><div id="pause-banner" hidden>Пауза</div></div>
+<div class="world-caption"><span id="location">Кибердеревня · окраина сети</span><span>Нажми на объект — андроид подойдёт</span></div>
+<div class="action-bar" aria-label="Действия"><button id="interact">Действие <kbd>E</kbd></button><button id="attack">Удар <kbd>Space</kbd></button><button id="build-belt" aria-pressed="false">Конвейер → <small>2 кр.</small></button><button id="build-factory" aria-pressed="false">Завод <small>8 кр.</small></button><button id="build-erase" aria-pressed="false">Разобрать</button></div>
+<div class="touch-controls" aria-label="Движение"><button data-dir="0,-1" aria-label="Вверх">↑</button><div><button data-dir="-1,0" aria-label="Влево">←</button><button data-dir="0,1" aria-label="Вниз">↓</button><button data-dir="1,0" aria-label="Вправо">→</button></div></div>
+</section>
+<aside><div class="mission-intro"><span class="badge">Первая смена</span><h2>Вернуть деревню<br>в сеть.</h2><p>Ты — списанный ИБ-андроид. Здесь баги едят кукурузу, а патчи растут из урожая. Пора навести порядок.</p></div>
+<ol id="quests" class="quests"></ol>
+<section class="journal"><h3>Бортовой журнал</h3><p id="log" role="status" aria-live="polite"></p></section>
+<div class="save-row"><span id="save-status">Сохранение на устройстве</span><button id="save">Сохранить</button></div><button id="restart" class="quiet">Новая деревня</button>
+</aside></div>
+<footer>Инди-студия колледжа · MVP 01 <span>WASD / стрелки — движение · E — действие · пробел — удар · Esc — пауза</span></footer>
+</main>
+<dialog id="modal" aria-labelledby="modal-title"><button class="close-modal" id="close-modal" aria-label="Закрыть окно">×</button><div id="modal-content"></div></dialog>
+<noscript>Для игры нужен включённый JavaScript. Сервер и установка не требуются.</noscript>
+<script src="loader.js"></script><script src="boot.js"></script>
+</body></html>
