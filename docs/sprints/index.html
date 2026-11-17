@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Спринты · Kernel Valley: Урожай багов | Инди-студия Колледжа им. Б. Рамеева</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rameev: {
+              bg: '#F4F5F7',
+              text: '#222222',
+              blue: '#2149A1',
+              sky: '#7199F1',
+              lime: '#EFFE74',
+              border: '#D4DCED',
+              card: '#FFFFFF',
+              dark: '#142242'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          boxShadow: {
+            'card': '0 4px 20px -2px rgba(33, 73, 161, 0.07)',
+            'card-hover': '0 12px 28px -4px rgba(33, 73, 161, 0.14)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #F4F5F7;
+      color: #222222;
+      font-family: 'Inter', sans-serif;
+    }
+    .bg-tech-grid {
+      background-image: radial-gradient(#7199F1 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-rameev-lime selection:text-rameev-blue">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-rameev-border shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-rameev-blue flex items-center justify-center text-white font-black text-lg shadow-sm relative overflow-hidden shrink-0">
+          <span class="z-10 tracking-tighter">ЦКР</span>
+          <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-rameev-lime"></div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-bold uppercase tracking-wider text-rameev-blue bg-rameev-bg px-2.5 py-0.5 rounded-md border border-rameev-border">
+              Цифровой колледж им. Башира Рамеева
+            </span>
+            <span class="text-xs font-extrabold uppercase tracking-wider bg-rameev-lime text-rameev-text px-2.5 py-0.5 rounded-md border border-rameev-blue/20">
+              Хаб спринтов
+            </span>
+          </div>
+          <h1 class="text-base sm:text-lg font-extrabold text-rameev-text mt-0.5 flex items-center gap-2">
+            <span>Инди-студия: «Kernel Valley: Урожай багов»</span>
+            <a href="https://github.com/RameevCollege/kernel_valley" target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex items-center gap-1 text-xs font-mono font-medium text-rameev-blue bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-rameev-sky/40 transition-colors">
+              <i class="fa-brands fa-github"></i> RameevCollege/kernel_valley
+            </a>
+          </h1>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-1.5 bg-rameev-bg p-1.5 rounded-xl border border-rameev-border text-xs font-semibold">
+        <a href="sprint1.html" class="px-3 py-1.5 rounded-lg text-gray-700 hover:text-rameev-blue hover:bg-white transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check text-emerald-600"></i> Спринт 1
+        </a>
+        <a href="sprint2.html" class="px-3 py-1.5 rounded-lg text-gray-700 hover:text-rameev-blue hover:bg-white transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check text-emerald-600"></i> Спринт 2
+        </a>
+        <a href="sprint3.html" class="px-3 py-1.5 rounded-lg bg-rameev-blue text-white shadow-sm hover:bg-rameev-dark transition-all flex items-center gap-1.5 font-bold">
+          <span class="w-2 h-2 rounded-full bg-rameev-lime animate-pulse"></span> Спринт 3
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+    <!-- HERO -->
+    <section class="relative rounded-3xl bg-gradient-to-br from-rameev-blue via-[#1B3B82] to-rameev-dark text-white p-6 sm:p-10 shadow-card overflow-hidden border border-rameev-sky/30">
+      <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-rameev-sky/20 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-16 w-80 h-80 rounded-full bg-rameev-lime/10 blur-2xl pointer-events-none"></div>
+
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-8 space-y-4">
+          <div class="inline-flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1 rounded-full bg-rameev-lime text-rameev-text font-extrabold text-xs uppercase tracking-wider shadow-sm">
+              <i class="fa-solid fa-gamepad mr-1"></i> Архив и портал занятий
+            </span>
+            <span class="px-3 py-1 rounded-full bg-white/10 text-white/90 font-mono text-xs border border-white/15">
+              2D Pixel-Art RPG · Stardew + Factorio + Hacker Sim
+            </span>
+          </div>
+
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+            Kernel Valley: <span class="text-rameev-lime">Урожай багов</span>
+          </h2>
+
+          <p class="text-blue-100 text-sm sm:text-base leading-relaxed max-w-2xl">
+            Единый сайт материалов инди-студии Колледжа им. Башира Рамеева. Здесь собраны все интерактивные страницы спринтов: от формирования команды и первых прототипов до работы с ветками Git и вайб-кодинга в VS Code.
+          </p>
+
+          <div class="flex flex-wrap gap-3 pt-2">
+            <a href="sprint3.html" class="px-5 py-3 rounded-xl bg-rameev-lime text-rameev-text font-extrabold text-sm hover:brightness-95 transition flex items-center gap-2 shadow-lg">
+              <i class="fa-solid fa-bolt"></i> Открыть активный Спринт 3
+            </a>
+            <a href="#sprints-list" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-rameev-lime"></i> Все спринты (3)
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4">
+          <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 space-y-3">
+            <div class="text-xs font-mono uppercase tracking-wider text-rameev-lime font-bold">
+              Статус студии
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+                <div class="text-2xl font-black font-mono text-white">3</div>
+                <div class="text-xs text-blue-100">Спринта</div>
+              </div>
+              <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+                <div class="text-2xl font-black font-mono text-rameev-lime">4</div>
+                <div class="text-xs text-blue-100">Отдела</div>
+              </div>
+              <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+                <div class="text-2xl font-black font-mono text-white">12</div>
+                <div class="text-xs text-blue-100">Участников</div>
+              </div>
+              <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+                <div class="text-2xl font-black font-mono text-emerald-300">HTML5</div>
+                <div class="text-xs text-blue-100">Офлайн-стек</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPRINTS LIST -->
+    <section id="sprints-list" class="space-y-6">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono font-bold uppercase tracking-wider text-rameev-blue">Дорожная карта занятий</span>
+          <h3 class="text-2xl sm:text-3xl font-black text-rameev-text mt-1">Спринты инди-студии</h3>
+        </div>
+        <div class="text-xs text-gray-500 font-medium">
+          Нажмите на карточку, чтобы открыть интерактивную страницу занятия
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- SPRINT 1 -->
+        <a href="sprint1.html" class="group bg-white rounded-2xl border border-rameev-border p-6 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-check"></i> Завершён
+              </span>
+              <span class="font-mono text-xs font-bold text-gray-400">Спринт 01</span>
+            </div>
+
+            <div>
+              <h4 class="text-xl font-black text-rameev-text group-hover:text-rameev-blue transition-colors">
+                Старт студии и концепт игры
+              </h4>
+              <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+                Оцифровка команды из 12 человек, распределение по 4 отделам и рождение сеттинга: советский ИБ-андроид на ферме с конвейерами.
+              </p>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-gray-600 pt-2 border-t border-rameev-border/60">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Персональный фильтр участника</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Конструктор промпта для первого MVP</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Тёмная тема Liquid Glass</li>
+            </ul>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-rameev-border/60 flex items-center justify-between text-sm font-bold text-rameev-blue">
+            <span>Открыть Спринт 1</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </a>
+
+        <!-- SPRINT 2 -->
+        <a href="sprint2.html" class="group bg-white rounded-2xl border border-rameev-border p-6 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-check"></i> Завершён
+              </span>
+              <span class="font-mono text-xs font-bold text-gray-400">Спринт 02 · 10.11.2026</span>
+            </div>
+
+            <div>
+              <h4 class="text-xl font-black text-rameev-text group-hover:text-rameev-blue transition-colors">
+                Питчинг MVP и магия Git
+              </h4>
+              <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+                Смотр первых прототипов с таймером питча, выбор 2D Pixel-Art Top-Down стиля и 4 интерактивных мультика про Git и GitHub.
+              </p>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-gray-600 pt-2 border-t border-rameev-border/60">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Таймер питчинга (2:00)</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> 4 анимированных сценария Git</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Словарь терминов и песочница</li>
+            </ul>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-rameev-border/60 flex items-center justify-between text-sm font-bold text-rameev-blue">
+            <span>Открыть Спринт 2</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </a>
+
+        <!-- SPRINT 3 (ACTIVE) -->
+        <a href="sprint3.html" class="group bg-white rounded-2xl border-2 border-rameev-blue p-6 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-rameev-lime text-rameev-text text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-bl-xl border-b border-l border-rameev-blue/20">
+            Активный спринт
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-3 py-1 rounded-full bg-rameev-blue text-white text-xs font-extrabold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-rameev-lime animate-pulse"></span> В работе
+              </span>
+              <span class="font-mono text-xs font-bold text-rameev-blue">Спринт 03 · 17.11.2026</span>
+            </div>
+
+            <div>
+              <h4 class="text-xl font-black text-rameev-text group-hover:text-rameev-blue transition-colors">
+                Ветки Git и VS Code + Kilo Code
+              </h4>
+              <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+                Чек-лист из 5 шагов, инспектор веток отделов (<code class="font-mono text-xs bg-rameev-bg px-1.5 py-0.5 rounded">team-*</code>), готовые промпты для ИИ-агентов и задачи по отделам.
+              </p>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-gray-600 pt-2 border-t border-rameev-border/60">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-bolt text-rameev-blue"></i> Интерактивная карта веток Git</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-bolt text-rameev-blue"></i> Гайд по Kilo Code и моделям 2026</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-bolt text-rameev-blue"></i> Задачи для Dev, GD, Art и Sound/QA</li>
+            </ul>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-rameev-border/60 flex items-center justify-between text-sm font-extrabold text-rameev-blue">
+            <span>Перейти к Спринту 3</span>
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- DEPARTMENTS QUICK INFO -->
+    <section class="bg-white rounded-3xl border border-rameev-border p-6 sm:p-8 shadow-card bg-tech-grid bg-opacity-10">
+      <div class="bg-white/95 rounded-2xl p-5 sm:p-6 border border-rameev-border/70">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+          <div>
+            <span class="text-xs font-mono font-bold uppercase tracking-wider text-rameev-blue">Структура репозитория</span>
+            <h3 class="text-xl font-black text-rameev-text mt-0.5">Ветки отделов студии</h3>
+          </div>
+          <a href="sprint3.html#branches" class="text-xs font-bold text-rameev-blue hover:underline flex items-center gap-1">
+            Открыть карту веток в Спринте 3 <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-4 rounded-xl bg-rameev-bg border border-rameev-border">
+            <div class="font-mono text-xs font-bold text-rameev-blue">team-dev</div>
+            <div class="font-bold text-sm mt-1">Разработка и ядро</div>
+            <p class="text-xs text-gray-600 mt-1">Механики фермы, конвейеров, ИИ-багов и сохранения.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-rameev-bg border border-rameev-border">
+            <div class="font-mono text-xs font-bold text-rameev-blue">team-gd</div>
+            <div class="font-bold text-sm mt-1">Геймдизайн и ИБ-лор</div>
+            <p class="text-xs text-gray-600 mt-1">Баланс, терминальные квизы и сценарии атак.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-rameev-bg border border-rameev-border">
+            <div class="font-mono text-xs font-bold text-rameev-blue">team-art</div>
+            <div class="font-bold text-sm mt-1">Пиксель-арт и UI</div>
+            <p class="text-xs text-gray-600 mt-1">Спрайты 2D Top-Down, тайлы и редактор дрона.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-rameev-bg border border-rameev-border">
+            <div class="font-mono text-xs font-bold text-rameev-blue">team-sound</div>
+            <div class="font-bold text-sm mt-1">Звук и QA</div>
+            <p class="text-xs text-gray-600 mt-1">Web Audio эффекты, эмбиент и баг-репорты.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-rameev-border bg-white mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-wrap items-center justify-between gap-4 text-xs text-gray-500">
+      <div class="flex items-center gap-2 font-semibold text-rameev-text">
+        <span class="px-2 py-0.5 rounded bg-rameev-blue text-white font-black">ЦКР</span>
+        <span>Инди-студия Колледжа им. Башира Рамеева · Kernel Valley</span>
+      </div>
+      <div class="flex items-center gap-4 font-semibold">
+        <a href="sprint1.html" class="hover:text-rameev-blue transition-colors">Спринт 1</a>
+        <a href="sprint2.html" class="hover:text-rameev-blue transition-colors">Спринт 2</a>
+        <a href="sprint3.html" class="hover:text-rameev-blue transition-colors">Спринт 3</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

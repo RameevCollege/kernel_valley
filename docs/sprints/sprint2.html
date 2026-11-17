@@ -150,8 +150,12 @@
         </a>
       </nav>
 
-      <!-- Мини-пульт таймера выступления студента (2:00) -->
-      <div class="flex items-center gap-2 bg-[#161B26] px-3 py-1.5 rounded-xl border border-white/15">
+      <!-- Мини-пульт таймера выступления студента (2:00) и ссылка на хаб -->
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-gray-200 hover:text-white text-xs font-bold border border-white/15 transition flex items-center gap-1.5" title="Ко всем спринтам">
+          <i class="fa-solid fa-layer-group text-rameev-lime"></i> <span class="hidden sm:inline">Все спринты</span>
+        </a>
+        <div class="flex items-center gap-2 bg-[#161B26] px-3 py-1.5 rounded-xl border border-white/15">
         <div class="text-right">
           <div id="pitch-speaker-label" class="text-[10px] font-mono text-gray-400 truncate max-w-[130px]">Таймер питча (2 мин)</div>
           <div id="pitch-timer-display" class="font-mono text-base font-bold text-rameev-lime leading-none">02:00</div>
@@ -162,6 +166,7 @@
         <button onclick="resetPitchTimer()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 text-xs transition" title="Сбросить на 02:00">
           <i class="fa-solid fa-rotate-left"></i>
         </button>
+        </div>
       </div>
 
     </div>

@@ -136,6 +136,10 @@
 
                 <!-- Sprint Switcher Pills -->
                 <div class="flex items-center gap-1.5 bg-rameev-bg p-1.5 rounded-xl border border-rameev-border text-xs font-semibold">
+                    <a href="index.html" class="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-rameev-blue hover:bg-white transition-all flex items-center gap-1" title="Главная страница всех спринтов">
+                        <i class="fa-solid fa-layer-group text-rameev-blue"></i>
+                        <span class="hidden sm:inline">Хаб</span>
+                    </a>
                     <button onclick="openSprintModal(1)" class="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-rameev-blue hover:bg-white transition-all flex items-center gap-1" title="Посмотреть итоги Спринта 1">
                         <i class="fa-solid fa-circle-check text-emerald-600"></i>
                         <span>Спринт 1</span>
@@ -1488,7 +1492,10 @@
                             </li>
                         `).join('')}
                     </ul>
-                    <div class="pt-2 flex justify-end">
+                    <div class="pt-2 flex flex-wrap items-center justify-between gap-2">
+                        <a href="sprint${sprintNum}.html" class="px-4 py-2 rounded-xl bg-rameev-bg text-rameev-blue border border-rameev-border text-xs font-bold hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5">
+                            Открыть страницу Спринта ${sprintNum} <i class="fa-solid fa-arrow-right"></i>
+                        </a>
                         <button onclick="closeSprintModal()" class="px-4 py-2 rounded-xl bg-rameev-blue text-white text-xs font-bold hover:bg-rameev-dark transition-colors">
                             Понятно, вернуться к Спринту 3
                         </button>
