@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Спринт 03 · Kernel Valley: Урожай багов | Инди-студия Колледжа им. Б. Рамеева</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rameev: {
+                            bg: '#F4F5F7',
+                            text: '#222222',
+                            blue: '#2149A1',
+                            sky: '#7199F1',
+                            lime: '#EFFE74',
+                            border: '#D4DCED',
+                            card: '#FFFFFF',
+                            dark: '#142242'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    boxShadow: {
+                        'card': '0 4px 20px -2px rgba(33, 73, 161, 0.07)',
+                        'card-hover': '0 12px 28px -4px rgba(33, 73, 161, 0.14)',
+                        'lime-glow': '0 0 0 3px rgba(239, 254, 116, 0.65)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F4F5F7;
+            color: #222222;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4F5F7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7199F1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2149A1;
+        }
+
+        /* Subtle Grid Background */
+        .bg-tech-grid {
+            background-image: radial-gradient(#7199F1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Branch Node Active Pulse */
+        .branch-node-active {
+            box-shadow: 0 0 0 4px #EFFE74, 0 8px 20px rgba(33, 73, 161, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Smooth transitions */
+        .transition-all-custom {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Code block styling */
+        .terminal-window {
+            background: #141B2D;
+            color: #E2E8F0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-rameev-lime selection:text-rameev-blue">
+
+    <!-- Toast Notification for Clipboard & Actions -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Modal for Previous Sprints Quick Summary -->
+    <div id="sprint-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-white border-2 border-rameev-border rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-fadeIn">
+            <button onclick="closeSprintModal()" class="absolute top-4 right-4 w-9 h-9 rounded-xl bg-rameev-bg hover:bg-rameev-blue hover:text-white flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="sprint-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- TOP STICKY HEADER -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-rameev-border shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-center justify-between py-3 gap-3">
+                <!-- Brand & College Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-rameev-blue flex items-center justify-center text-white font-black text-lg shadow-sm relative overflow-hidden shrink-0">
+                        <span class="z-10 tracking-tighter">ЦКР</span>
+                        <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-rameev-lime"></div>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs font-bold uppercase tracking-wider text-rameev-blue bg-rameev-bg px-2.5 py-0.5 rounded-md border border-rameev-border">
+                                Цифровой колледж им. Башира Рамеева
+                            </span>
+                            <span class="text-xs font-extrabold uppercase tracking-wider bg-rameev-lime text-rameev-text px-2.5 py-0.5 rounded-md border border-rameev-blue/20">
+                                Спринт 03 · 17.11.2026
+                            </span>
+                        </div>
+                        <h1 class="text-base sm:text-lg font-extrabold text-rameev-text mt-0.5 flex items-center gap-2">
+                            <span>Инди-студия: «Kernel Valley: Урожай багов»</span>
+                            <span class="hidden md:inline-flex items-center gap-1 text-xs font-mono font-medium text-rameev-blue bg-blue-50 px-2 py-0.5 rounded border border-rameev-sky/40">
+                                <i class="fa-brands fa-github"></i> Rameev-College/Kernel-Valley
+                            </span>
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Sprint Switcher Pills -->
+                <div class="flex items-center gap-1.5 bg-rameev-bg p-1.5 rounded-xl border border-rameev-border text-xs font-semibold">
+                    <button onclick="openSprintModal(1)" class="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-rameev-blue hover:bg-white transition-all flex items-center gap-1" title="Посмотреть итоги Спринта 1">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                        <span>Спринт 1</span>
+                    </button>
+                    <button onclick="openSprintModal(2)" class="px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-rameev-blue hover:bg-white transition-all flex items-center gap-1" title="Посмотреть итоги Спринта 2">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                        <span>Спринт 2</span>
+                    </button>
+                    <span class="px-3 py-1.5 rounded-lg bg-rameev-blue text-white shadow-sm flex items-center gap-1.5 font-bold">
+                        <span class="w-2 h-2 rounded-full bg-rameev-lime animate-pulse"></span>
+                        <span>Спринт 3 · Активный</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Section Quick Navigation Bar -->
+            <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto py-2 border-t border-rameev-border/60 text-xs sm:text-sm font-medium no-scrollbar">
+                <a href="#hero" class="px-3 py-1.5 rounded-lg hover:bg-rameev-bg hover:text-rameev-blue transition-colors whitespace-nowrap flex items-center gap-1.5">
+                    <i class="fa-solid fa-compass text-rameev-sky"></i> Фокус недели
+                </a>
+                <a href="#checklist" class="px-3 py-1.5 rounded-lg hover:bg-rameev-bg hover:text-rameev-blue transition-colors whitespace-nowrap flex items-center gap-1.5">
+                    <i class="fa-solid fa-list-check text-rameev-blue"></i> Чек-лист (5 шагов)
+                </a>
+                <a href="#branches" class="px-3 py-1.5 rounded-lg hover:bg-rameev-bg hover:text-rameev-blue transition-colors whitespace-nowrap flex items-center gap-1.5">
+                    <i class="fa-solid fa-code-branch text-rameev-blue"></i> Карта веток Git
+                </a>
+                <a href="#vibecoding" class="px-3 py-1.5 rounded-lg hover:bg-rameev-bg hover:text-rameev-blue transition-colors whitespace-nowrap flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-magic-sparkles text-rameev-blue"></i> VS Code + Kilo Code
+                </a>
+                <a href="#tasks" class="px-3 py-1.5 rounded-lg hover:bg-rameev-bg hover:text-rameev-blue transition-colors whitespace-nowrap flex items-center gap-1.5">
+                    <i class="fa-solid fa-users-gear text-rameev-blue"></i> Задачи отделов
+                </a>
+                <a href="#ai-guide" class="px-3 py-1.5 rounded-lg bg-rameev-lime/60 hover:bg-rameev-lime text-rameev-text font-bold transition-colors whitespace-nowrap flex items-center gap-1.5 ml-auto border border-rameev-blue/15">
+                    <i class="fa-solid fa-microchip text-rameev-blue"></i> Гайд по ИИ (Q&A 2026)
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-10">
+
+        <!-- ==========================================
+             1. HERO BLOCK (ФОКУС СПРИНТА 3)
+             ========================================== -->
+        <section id="hero" class="relative rounded-3xl bg-gradient-to-br from-rameev-blue via-[#1B3B82] to-rameev-dark text-white p-6 sm:p-10 shadow-card overflow-hidden border border-rameev-sky/30">
+            <!-- Decorative background elements -->
+            <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-rameev-sky/20 blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-16 w-80 h-80 rounded-full bg-rameev-lime/10 blur-2xl pointer-events-none"></div>
+
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Left Column: Title, Context & Key Goal -->
+                <div class="lg:col-span-7 space-y-5">
+                    <div class="inline-flex flex-wrap items-center gap-2">
+                        <span class="px-3 py-1 rounded-full bg-rameev-lime text-rameev-text font-extrabold text-xs uppercase tracking-wider shadow-sm">
+                            <i class="fa-solid fa-bolt mr-1"></i> Практикум · Занятие №3
+                        </span>
+                        <span class="px-3 py-1 rounded-full bg-white/10 text-white/90 font-mono text-xs border border-white/15">
+                            Лид студии: Юрий Самплин
+                        </span>
+                        <span class="px-3 py-1 rounded-full bg-white/10 text-rameev-lime font-mono text-xs border border-white/15">
+                            2D Pixel-Art RPG · Stardew + Factorio + Hacker Sim
+                        </span>
+                    </div>
+
+                    <h2 class="text-2xl sm:text-4xl lg:text-[40px] font-black leading-tight tracking-tight">
+                        Спринт 3: Выход в <span class="text-rameev-lime underline decoration-rameev-sky/60 decoration-wavy underline-offset-4">GitHub</span>, связка VS Code + Kilo Code и разработка 24/7
+                    </h2>
+
+                    <p class="text-blue-100 text-sm sm:text-base leading-relaxed max-w-2xl">
+                        Главная цель недели — перейти от разрозненных локальных набросков к полноценной командной работе в едином облачном репозитории организации <code class="bg-white/15 px-2 py-0.5 rounded font-mono text-rameev-lime">Rameev-College / Kernel-Valley</code> с использованием встроенных в VS Code бесплатных ИИ-агентов.
+                    </p>
+
+                    <!-- Quick Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                        <a href="#checklist" class="px-5 py-3 rounded-xl bg-rameev-lime text-rameev-text font-extrabold text-sm hover:bg-white transition-all shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-rocket text-rameev-blue"></i>
+                            <span>Начать по чек-листу</span>
+                        </a>
+                        <a href="https://learngitbranching.js.org/?locale=ru_RU" target="_blank" rel="noopener noreferrer" class="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm border border-white/20 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad text-rameev-lime"></i>
+                            <span>Тренажёр Learn Git Branching</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-75"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column: Live Terminal Simulation of Lesson 3 -->
+                <div class="lg:col-span-5">
+                    <div class="terminal-window rounded-2xl border border-rameev-sky/40 shadow-2xl overflow-hidden font-mono text-xs">
+                        <!-- Terminal Header -->
+                        <div class="bg-[#0D1322] px-4 py-2.5 flex items-center justify-between border-b border-slate-700/80">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                <span class="ml-2 text-slate-400 text-[11px]">samplin@lubuntu-server:~/vibe-coding/Kernel-Valley</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-rameev-blue/50 text-rameev-lime text-[10px] border border-rameev-sky/30">Kilo Code · Auto-Free</span>
+                        </div>
+                        <!-- Terminal Body -->
+                        <div class="p-4 space-y-2.5 leading-relaxed">
+                            <div class="text-slate-400"># 1. Клонируем репо организации в VS Code</div>
+                            <div>
+                                <span class="text-emerald-400">$</span> git clone https://github.com/Rameev-College/Kernel-Valley.git
+                            </div>
+                            <div class="text-slate-300 pl-3 border-l-2 border-rameev-sky/50 text-[11px]">
+                                Cloning into 'Kernel-Valley'... done.<br>
+                                Checked out <span class="text-rameev-lime">master</span> (README.md, AGENTS.md, /sprints, /mvp)
+                            </div>
+                            <div class="text-slate-400 pt-1"># 2. ИИ-агент создал ветки для отделов студии</div>
+                            <div>
+                                <span class="text-emerald-400">$</span> git branch -a
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 text-[11px] pl-2">
+                                <span class="text-rose-300">🔒 master (protected)</span>
+                                <span class="text-rameev-lime font-bold">* team-dev</span>
+                                <span class="text-sky-300">  team-gd</span>
+                                <span class="text-purple-300">  team-art</span>
+                                <span class="text-amber-300">  team-sound</span>
+                                <span class="text-emerald-300">  my-mvp</span>
+                            </div>
+                            <div class="pt-1 bg-slate-800/90 p-2.5 rounded-xl border border-slate-700 text-[11px] text-slate-200 flex items-start gap-2">
+                                <i class="fa-solid fa-shield-halved text-rameev-lime mt-0.5"></i>
+                                <span><strong>Правило репозитория:</strong> В <code class="text-rose-300">master</code> пушить напрямую нельзя! Каждый работает в ветке своего отдела или личного MVP.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 Key Metric Cards inside Hero -->
+            <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-6 border-t border-white/15">
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold tracking-wider text-blue-200">Организация GitHub</span>
+                        <i class="fa-brands fa-github text-lg text-rameev-lime"></i>
+                    </div>
+                    <div class="text-xl font-black mt-1 font-mono">Rameev-College</div>
+                    <p class="text-xs text-blue-100 mt-1">Принять инвайт на почте + обязательно включить 2FA</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold tracking-wider text-blue-200">Общий репозиторий</span>
+                        <i class="fa-solid fa-folder-tree text-lg text-rameev-lime"></i>
+                    </div>
+                    <div class="text-xl font-black mt-1 font-mono">Kernel-Valley</div>
+                    <p class="text-xs text-blue-100 mt-1">Документация, <code class="text-rameev-lime">AGENTS.md</code> на 500 строк и GitHub Pages</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold tracking-wider text-blue-200">Архитектура веток</span>
+                        <i class="fa-solid fa-code-branch text-lg text-rameev-lime"></i>
+                    </div>
+                    <div class="text-xl font-black mt-1">4 отдела + MVP</div>
+                    <p class="text-xs text-blue-100 mt-1"><code class="text-rameev-lime">team-dev</code>, <code class="text-rameev-lime">gd</code>, <code class="text-rameev-lime">art</code>, <code class="text-rameev-lime">sound</code> + персональные ветки игр</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold tracking-wider text-blue-200">Режим разработки</span>
+                        <i class="fa-solid fa-clock-rotate-left text-lg text-rameev-lime"></i>
+                    </div>
+                    <div class="text-xl font-black mt-1">24/7 Синхрон</div>
+                    <p class="text-xs text-blue-100 mt-1"><code class="text-rameev-lime">git pull</code> после учёбы → работа с Kilo Code → <code class="text-rameev-lime">git push</code></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             2. ИНТЕРАКТИВНЫЙ ПОШАГОВЫЙ ЧЕК-ЛИСТ УЧАСТНИКА
+             ========================================== -->
+        <section id="checklist" class="bg-white rounded-3xl p-6 sm:p-8 border border-rameev-border shadow-card">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-rameev-border">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-rameev-blue bg-rameev-bg px-3 py-1 rounded-full mb-2">
+                        <i class="fa-solid fa-list-check"></i> Обязательный маршрут недели
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-rameev-text">
+                        Пошаговый чек-лист участника Спринта 3
+                    </h2>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Отмечай выполненные пункты — твой прогресс автоматически сохраняется в браузере.
+                    </p>
+                </div>
+
+                <!-- Progress Widget -->
+                <div class="bg-rameev-bg rounded-2xl p-4 border border-rameev-border min-w-[260px]">
+                    <div class="flex items-center justify-between text-xs font-bold mb-2">
+                        <span class="text-rameev-blue uppercase tracking-wider">Готовность к ревью:</span>
+                        <span id="checklist-counter" class="font-mono text-sm font-black bg-rameev-lime px-2 py-0.5 rounded text-rameev-text">0 / 5 (0%)</span>
+                    </div>
+                    <div class="w-full h-3 bg-white rounded-full overflow-hidden border border-rameev-border p-0.5">
+                        <div id="checklist-bar" class="h-full bg-rameev-blue rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <span id="checklist-status-text" class="text-[11px] text-gray-500">Начни с настройки GitHub и 2FA</span>
+                        <button onclick="resetChecklist()" class="text-[11px] text-gray-400 hover:text-rose-600 underline transition-colors">Сбросить</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checklist Items Container -->
+            <div class="mt-6 space-y-4" id="checklist-items-container">
+                <!-- Populated & managed via JS for instant reactivity -->
+            </div>
+        </section>
+
+        <!-- ==========================================
+             3. ИНТЕРАКТИВНАЯ СХЕМА ВЕТОК (GIT BRANCH EXPLORER)
+             ========================================== -->
+        <section id="branches" class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-rameev-blue bg-white px-3 py-1 rounded-full border border-rameev-border mb-2 shadow-sm">
+                        <i class="fa-solid fa-diagram-project text-rameev-sky"></i> Интерактивная карта репозитория
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-rameev-text">
+                        Структура веток <code class="font-mono text-rameev-blue bg-white px-2.5 py-0.5 rounded-xl border border-rameev-border">Kernel-Valley</code>
+                    </h2>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Нажми на любую ветку на схеме ниже, чтобы увидеть её участников, правила коммитов и какие файлы туда загружать.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 text-xs font-semibold bg-white px-3.5 py-2 rounded-xl border border-rameev-border">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                    <span><code class="font-mono font-bold">master</code> — закрыт от прямого Push</span>
+                    <span class="mx-1 text-gray-300">|</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <span>Ветки отделов — права <code class="font-mono font-bold">Write</code></span>
+                </div>
+            </div>
+
+            <!-- Interactive Branch Selector + Inspector Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Left Column: Visual Git Tree Navigation (5 cols) -->
+                <div class="lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 border border-rameev-border shadow-card space-y-3">
+                    <div class="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center justify-between mb-2">
+                        <span>Дерево веток Origin (GitHub)</span>
+                        <span class="font-mono text-[11px] text-rameev-blue">git branch -a</span>
+                    </div>
+
+                    <div id="branch-buttons-list" class="space-y-2.5 relative before:content-[''] before:absolute before:left-6 before:top-6 before:bottom-6 before:w-0.5 before:bg-rameev-border">
+                        <!-- Rendered via JS -->
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-rameev-border bg-rameev-bg/70 rounded-2xl p-3.5 text-xs text-gray-600 space-y-1.5">
+                        <div class="font-bold text-rameev-blue flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info"></i> Как не сломать общий проект?
+                        </div>
+                        <p>
+                            Прямой коммит в <code class="font-mono font-bold text-rose-600">master</code> заблокирован настройками репозитория (чтобы никто случайно не перезаписал чужую работу). Слияние (<code class="font-mono">Merge</code>) всех веток в единого «монстра» мы проводим вместе на следующем созвоне!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Column: Active Branch Inspector Card (7 cols) -->
+                <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border-2 border-rameev-blue/20 shadow-card" id="branch-inspector">
+                    <!-- Dynamic content injected by selectBranch(branchId) -->
+                </div>
+            </div>
+
+            <!-- HOW GIT WORKS UNDER THE HOOD (ДЕЛЬТА КОММИТОВ И ПАПКА .GIT) -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-rameev-border shadow-card">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider bg-rameev-lime text-rameev-text px-3 py-1 rounded-full">
+                            <i class="fa-solid fa-gears text-rameev-blue"></i> Как устроен Git под капотом
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black text-rameev-text">
+                            Почему коммит файла на 1000 строк весит всего пару байт и как работает машина времени <code class="font-mono text-rameev-blue">.git</code>
+                        </h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            На занятии мы разобрали главный принцип Git: <strong>коммиты не перезагружают ваши файлы целиком заново</strong>. Если у вас есть скрипт игры на 1000 строк и вы поменяли в нём всего 2 строчки, коммит сохранит только <strong>дельту изменений</strong> (эти 2 строки и ссылку на место вставки относительно предыдущего коммита).
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div class="bg-rameev-bg rounded-2xl p-4 border border-rameev-border">
+                                <div class="font-bold text-sm text-rameev-blue flex items-center gap-2">
+                                    <i class="fa-solid fa-folder-open"></i> Скрытая папка <code class="font-mono">.git</code>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                                    Включите показ скрытых файлов в папке проекта: внутри <code class="font-mono">.git</code> лежат все ветки (<code class="font-mono">branches</code>), история объектов, хуки и логи каждого вашего действия.
+                                </p>
+                            </div>
+                            <div class="bg-rameev-bg rounded-2xl p-4 border border-rameev-border">
+                                <div class="font-bold text-sm text-rameev-blue flex items-center gap-2">
+                                    <i class="fa-solid fa-rotate-left"></i> Кнопка «Отменить» (Discard)
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                                    Случайно удалили <code class="font-mono">README.md</code> или сломали код в папке? Вкладка <strong>Source Control</strong> в VS Code видит удаление и в 1 клик достаёт файл из предыдущего коммита!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Delta / Discard Simulator -->
+                    <div class="lg:col-span-6">
+                        <div class="bg-rameev-bg rounded-2xl p-4 sm:p-5 border border-rameev-border space-y-4">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span class="text-xs font-extrabold uppercase tracking-wider text-rameev-blue">
+                                    <i class="fa-solid fa-flask mr-1"></i> Интерактивная демонстрация Git Diff & Restore
+                                </span>
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="setGitSimMode('delta')" id="sim-btn-delta" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rameev-blue text-white transition-all">
+                                        Дельта (2 строки из 1000)
+                                    </button>
+                                    <button onclick="setGitSimMode('delete')" id="sim-btn-delete" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-gray-700 border border-rameev-border hover:border-rameev-blue transition-all">
+                                        Случайное удаление файла
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="git-sim-display" class="terminal-window rounded-xl p-4 font-mono text-xs space-y-2 border border-slate-700">
+                                <!-- Filled dynamically by setGitSimMode -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             4. ПРАКТИКУМ ПО ВАЙБ-КОДИНГУ (VS CODE + KILO CODE + МАРКДАУН)
+             ========================================== -->
+        <section id="vibecoding" class="space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-rameev-border shadow-card">
+                <div class="max-w-3xl">
+                    <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-rameev-blue bg-rameev-bg px-3 py-1 rounded-full mb-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Культура работы с ИИ-агентами
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-rameev-text">
+                        База вайб-кодера: 4 главных принципа из занятия
+                    </h2>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Как выжимать максимум из бесплатных моделей в <code class="font-mono text-rameev-blue font-bold">Kilo Code</code>, экономить лимиты токенов и не дать агенту случайно грохнуть вашу систему.
+                    </p>
+                </div>
+
+                <!-- 4 Pillars Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
+                    <!-- Pillar 1: Markdown -->
+                    <div class="rounded-2xl p-5 bg-rameev-bg/70 border border-rameev-border flex flex-col justify-between space-y-3">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-lg bg-rameev-blue text-white font-mono text-xs font-bold">01 · Разметка Markdown (.md)</span>
+                                <span class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">Экономит кучу токенов</span>
+                            </div>
+                            <h3 class="text-lg font-extrabold text-rameev-text">Учите синтаксис Markdown — это родной язык агентов</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                Файлы <code class="font-mono font-bold">README.md</code> и <code class="font-mono font-bold">AGENTS.md</code> пишутся в разметке Markdown. Таблицы, заголовки и цитаты размечаются простыми символами, весят минимум токенов и нативно открываются в Word, LibreOffice или экспортируются в HTML, PDF и DOCX.
+                            </p>
+                        </div>
+                        <div class="bg-white rounded-xl p-3 border border-rameev-border font-mono text-[11px] text-gray-700 space-y-1">
+                            <div><span class="text-rameev-blue font-bold"># Заголовок 1</span> &nbsp;│&nbsp; <span class="text-rameev-blue font-bold">## Заголовок 2</span></div>
+                            <div><span class="text-emerald-700 font-bold">&gt; Важная цитата или правило для агента</span></div>
+                            <div><span class="text-purple-700 font-bold">| Отдел | Ветка |</span> &larr; текстовая таблица без лишних тегов</div>
+                        </div>
+                    </div>
+
+                    <!-- Pillar 2: English Prompts = 2x Less Tokens -->
+                    <div class="rounded-2xl p-5 bg-rameev-bg/70 border border-rameev-border flex flex-col justify-between space-y-3">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-lg bg-rameev-blue text-white font-mono text-xs font-bold">02 · Английский язык</span>
+                                <span class="text-xs font-extrabold text-rameev-text bg-rameev-lime px-2.5 py-0.5 rounded-full">×2 меньше расход токенов</span>
+                            </div>
+                            <h3 class="text-lg font-extrabold text-rameev-text">Пишите запросы агенту на английском</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                Внутренний стек у <strong>Kilo Code</strong> англоязычный. Когда вы пишете промпт на русском, кириллица разбивается на большее число токенов — вы сжигаете в <strong>2 раза больше лимита</strong>! Учитывая ограничения Kilo Code на 1 час, 5 часов, сутки и неделю, английский язык удваивает ваше время работы.
+                            </p>
+                        </div>
+                        <div class="bg-white rounded-xl p-3 border border-rameev-border text-xs flex items-center justify-between">
+                            <span class="text-rose-600 font-mono">RU: ~42 токена за фразу</span>
+                            <i class="fa-solid fa-arrow-right text-gray-400"></i>
+                            <span class="text-emerald-700 font-mono font-bold">EN: ~19 токенов за ту же мысль</span>
+                        </div>
+                    </div>
+
+                    <!-- Pillar 3: Copy Relative Path & Exact Context -->
+                    <div class="rounded-2xl p-5 bg-rameev-bg/70 border border-rameev-border flex flex-col justify-between space-y-3">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-lg bg-rameev-blue text-white font-mono text-xs font-bold">03 · Copy Relative Path</span>
+                                <span class="text-xs font-semibold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">Разбор бага с урока</span>
+                            </div>
+                            <h3 class="text-lg font-extrabold text-rameev-text">Давайте бесплатным моделям точную опору</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                Бесплатные модели (<code class="font-mono">Auto-Free</code>) глупее платного Claude Opus: когда Юрий написал <em>«создай ветки согласно планам из спринтов»</em>, агент создал ненужные ветки <code class="font-mono text-rose-600">sprint-1</code> и <code class="font-mono text-rose-600">sprint-2</code>. Нажимайте <strong>ПКМ по папке → Copy Relative Path</strong> и чётко перечисляйте, что именно создать (ветки для команд <code class="font-mono">team-dev</code>, <code class="font-mono">team-art</code> и т.д.).
+                            </p>
+                        </div>
+                        <div class="bg-white rounded-xl p-3 border border-rameev-border font-mono text-[11px] text-gray-700">
+                            <span class="text-rose-600">❌ «Создай нужные ветки из спринтов»</span><br>
+                            <span class="text-emerald-700 font-bold">✅ «Create branches for separate teams (dev, art, gd, sound) using info from sprints/sprint_1.html»</span>
+                        </div>
+                    </div>
+
+                    <!-- Pillar 4: Security (No Auto-Approve) + Politeness -->
+                    <div class="rounded-2xl p-5 bg-rameev-bg/70 border border-rameev-border flex flex-col justify-between space-y-3">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-lg bg-rameev-blue text-white font-mono text-xs font-bold">04 · Безопасность и этикет</span>
+                                <span class="text-xs font-semibold text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">Не включать Auto-approve!</span>
+                            </div>
+                            <h3 class="text-lg font-extrabold text-rameev-text">Проверяйте команды терминала и хвалите нейросеть</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                <strong>1) Никогда не ставьте галочку Auto-approve:</strong> всегда читайте команду, которую агент хочет выполнить в вашей консоли. Не знаете команду Linux/Git — спросите у DeepSeek в браузере, чтобы агент ничего не удалил.<br>
+                                <strong>2) Хвалите агента («Отлично, спасибо!»):</strong> исследования подтверждают, что позитивное подкрепление реально повышает качество следующего ответа LLM.
+                            </p>
+                        </div>
+                        <div class="bg-white rounded-xl p-3 border border-rameev-border font-mono text-[11px] text-emerald-700 font-semibold">
+                            💬 «Great job, thank you! Now please move my MVP folder into a separate branch...»
+                        </div>
+                    </div>
+                </div>
+
+                <!-- READY-TO-COPY PROMPTS FOR KILO CODE -->
+                <div class="mt-8 pt-6 border-t border-rameev-border">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                        <div>
+                            <h3 class="text-xl font-black text-rameev-text flex items-center gap-2">
+                                <i class="fa-solid fa-terminal text-rameev-blue"></i>
+                                Готовые промпты для плагина Kilo Code (скопируй в 1 клик)
+                            </h3>
+                            <p class="text-xs text-gray-600 mt-0.5">
+                                Доступны версии на английском (экономия 50% токенов) и на русском языке.
+                            </p>
+                        </div>
+                        <div class="inline-flex items-center bg-rameev-bg p-1 rounded-xl border border-rameev-border text-xs font-bold">
+                            <button onclick="togglePromptLang('en')" id="lang-btn-en" class="px-3 py-1.5 rounded-lg bg-rameev-blue text-white transition-all">
+                                🇬🇧 English (Recommended)
+                            </button>
+                            <button onclick="togglePromptLang('ru')" id="lang-btn-ru" class="px-3 py-1.5 rounded-lg text-gray-600 hover:text-rameev-blue transition-all">
+                                🇷🇺 Русский
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" id="prompts-container">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             5. ЗАДАЧИ ПО ОТДЕЛАМ НА СПРИНТ 3
+             ========================================== -->
+        <section id="tasks" class="bg-white rounded-3xl p-6 sm:p-8 border border-rameev-border shadow-card space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-rameev-border pb-5">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-rameev-blue bg-rameev-bg px-3 py-1 rounded-full mb-2">
+                        <i class="fa-solid fa-people-group"></i> Командная работа 24/7 до следующего вторника
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-rameev-text">
+                        Задачи по отделам студии и распределение по веткам
+                    </h2>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Выбери свой отдел, проверь свою ветку в репозитории и отметь задачи, которые вынесешь на общий показ.
+                    </p>
+                </div>
+
+                <!-- Department Filter Buttons -->
+                <div class="flex flex-wrap gap-1.5 bg-rameev-bg p-1.5 rounded-2xl border border-rameev-border text-xs font-bold">
+                    <button onclick="filterDeptTasks('all')" data-dept-btn="all" class="dept-filter-btn px-3 py-2 rounded-xl bg-rameev-blue text-white shadow-sm transition-all">
+                        Все (12 чел.)
+                    </button>
+                    <button onclick="filterDeptTasks('dev')" data-dept-btn="dev" class="dept-filter-btn px-3 py-2 rounded-xl text-gray-700 hover:bg-white transition-all">
+                        💻 Dev (5)
+                    </button>
+                    <button onclick="filterDeptTasks('gd')" data-dept-btn="gd" class="dept-filter-btn px-3 py-2 rounded-xl text-gray-700 hover:bg-white transition-all">
+                        📜 GD (3)
+                    </button>
+                    <button onclick="filterDeptTasks('art')" data-dept-btn="art" class="dept-filter-btn px-3 py-2 rounded-xl text-gray-700 hover:bg-white transition-all">
+                        🎨 Art (4)
+                    </button>
+                    <button onclick="filterDeptTasks('sound')" data-dept-btn="sound" class="dept-filter-btn px-3 py-2 rounded-xl text-gray-700 hover:bg-white transition-all">
+                        🎵 Sound & QA (2+)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Department Cards Container -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="dept-tasks-grid">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+
+        <!-- ==========================================
+             6. ШПАРГАЛКА ИЗ Q&A: ЧЕМ ПОЛЬЗОВАТЬСЯ ДЛЯ ВАЙБ-КОДИНГА В КОНЦЕ 2026 ГОДА
+             ========================================== -->
+        <section id="ai-guide" class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-rameev-blue/25 shadow-card space-y-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-rameev-lime text-rameev-text text-xs font-black uppercase tracking-wider px-4 py-1.5 rounded-bl-2xl border-b border-l border-rameev-blue/20">
+                По следам Q&A с Надеждой Мосуновой
+            </div>
+
+            <div class="max-w-3xl pt-2">
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-rameev-blue bg-rameev-bg px-3 py-1 rounded-full mb-2">
+                    <i class="fa-solid fa-satellite-dish"></i> Актуальная сводка на ноябрь 2026
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-rameev-text">
+                    На чём вайб-кодить в конце 2026 года: лимиты, баны и рабочие связки
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">
+                    Во второй части созвона мы подробно разобрали, какие ИИ-агенты сейчас реально работают, почему нельзя покупать Claude Code и как утроить лимиты токенов в Google Antigravity.
+                </p>
+            </div>
+
+            <!-- Comparison Cards of 4 AI Tools -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- 1. Kilo Code -->
+                <div class="rounded-2xl p-5 bg-rameev-bg/60 border-2 border-emerald-500/40 flex flex-col justify-between space-y-4">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800">
+                                ✅ База для старта
+                            </span>
+                            <span class="font-mono text-xs font-bold text-emerald-700">Бесплатно</span>
+                        </div>
+                        <h3 class="text-lg font-black text-rameev-text">Kilo Code (VS Code)</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Опенсорсный плагин с режимом <code class="font-mono font-bold">Auto (Free)</code>. Сам выбирает бесплатную модель под сложность запроса. Работает сразу без покупок и карт.
+                        </p>
+                        <ul class="text-xs text-gray-700 space-y-1 pt-1">
+                            <li><i class="fa-solid fa-check text-emerald-600 mr-1.5"></i> Идеален для задач нашего спринта</li>
+                            <li><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5"></i> Лимиты: на 1ч, 5ч, сутки и неделю</li>
+                            <li><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5"></i> Бесплатным моделям нужны чёткие промпты</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-rameev-border text-[11px] font-medium text-rameev-blue">
+                        💡 Ставить только оригинал с белой галочкой (~1.7M скачиваний).
+                    </div>
+                </div>
+
+                <!-- 2. Google Antigravity (Argon + Hydrogen) -->
+                <div class="rounded-2xl p-5 bg-gradient-to-b from-blue-50/90 to-white border-2 border-rameev-blue shadow-md flex flex-col justify-between space-y-4">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-rameev-lime text-rameev-text border border-rameev-blue/20">
+                                🔥 Топ-выбор (Платный)
+                            </span>
+                            <span class="font-mono text-xs font-bold text-rameev-blue">Аккаунт Pro США</span>
+                        </div>
+                        <h3 class="text-lg font-black text-rameev-blue">Google Antigravity</h3>
+                        <p class="text-xs text-gray-700 leading-relaxed">
+                            Лучшая замена Claude Code для серьёзной автоматизации и фриланса. Внутри две мощные модели с <strong>отдельными лимитами</strong>:
+                        </p>
+                        <ul class="text-xs text-gray-700 space-y-1.5 pt-1">
+                            <li><span class="font-bold text-rameev-blue">1. Модель Argon:</span> супер-умный архитектор (пишет подробный план <code class="font-mono">To-Do</code>).</li>
+                            <li><span class="font-bold text-rameev-blue">2. Модель Hydrogen:</span> большая рабочая лошадка на каждый день (выполняет <code class="font-mono">To-Do</code>).</li>
+                            <li><span class="font-bold text-rameev-blue">3. Сайт Gemini:</span> третий отдельный пул токенов для планирования!</li>
+                        </ul>
+                    </div>
+                    <div class="bg-rameev-blue text-white p-2.5 rounded-xl text-[11px] leading-snug">
+                        🎯 <strong>Схема Юрия:</strong> План пишем в Argon (или на сайте Gemini) &rarr; код пишем в Hydrogen = <strong>×3 больше токенов</strong>!
+                    </div>
+                </div>
+
+                <!-- 3. Claude Code -->
+                <div class="rounded-2xl p-5 bg-rose-50/50 border-2 border-rose-300 flex flex-col justify-between space-y-4">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-100 text-rose-800">
+                                ⛔ НЕ ПОКУПАТЬ СЕЙЧАС
+                            </span>
+                            <span class="font-mono text-xs font-bold text-rose-700">Волна банов</span>
+                        </div>
+                        <h3 class="text-lg font-black text-gray-900">Claude Code</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Технически шикарный инструмент, но 2 недели назад перед выходом компании на биржу (IPO) прошла жёсткая зачистка аккаунтов по всему миру.
+                        </p>
+                        <ul class="text-xs text-gray-700 space-y-1 pt-1">
+                            <li><i class="fa-solid fa-ban text-rose-600 mr-1.5"></i> Тотальный бан аккаунтов из РФ, СНГ и даже Казахстана</li>
+                            <li><i class="fa-solid fa-ban text-rose-600 mr-1.5"></i> У Юрия заблокировали 2 аккаунта (на $200 и $20)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-rose-200 text-[11px] font-semibold text-rose-700">
+                        ⚠️ Деньги на ветер: сейчас из РФ/СНГ без шансов.
+                    </div>
+                </div>
+
+                <!-- 4. ChatGPT Plus -->
+                <div class="rounded-2xl p-5 bg-amber-50/40 border border-amber-300 flex flex-col justify-between space-y-4">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800">
+                                ⚠️ Жёсткие лимиты
+                            </span>
+                            <span class="font-mono text-xs font-bold text-amber-800">20 минут работы</span>
+                        </div>
+                        <h3 class="text-lg font-black text-gray-900">ChatGPT + GitHub Copilot</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            У ChatGPT сейчас микроскопические лимиты при огромном расходе токенов: пятичасовой лимит сгорает буквально за 20 минут сборки одной презентации.
+                        </p>
+                        <ul class="text-xs text-gray-700 space-y-1 pt-1">
+                            <li><i class="fa-solid fa-xmark text-rose-500 mr-1.5"></i> ChatGPT не годится для длительного кодинга</li>
+                            <li><i class="fa-solid fa-check text-emerald-600 mr-1.5"></i> <strong>GitHub Copilot</strong> хорош только как резерв (написать коммит, мелкая правка)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-amber-200 text-[11px] text-gray-700">
+                        📌 Copilot держим про запас на случай, если основные агенты отвалились.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Buyer's Guide & OpenWRT Pro Tip Accordion/Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+                <!-- How to safely buy Antigravity Pro account -->
+                <div class="lg:col-span-7 bg-rameev-bg rounded-2xl p-5 border border-rameev-border space-y-3">
+                    <div class="flex items-center gap-2 text-sm font-black text-rameev-blue">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Памятка: как правильно покупать аккаунт для Antigravity (Plati.Market / GGSel / Playerok)</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-white p-3.5 rounded-xl border border-rameev-border space-y-1">
+                            <div class="font-extrabold text-rameev-text">1. Только готовый аккаунт</div>
+                            <p class="text-gray-600 leading-relaxed">
+                                Не берите «инвайт в семью» на свой старый аккаунт: если страна регистрации или прошлых платежей (например, США/Германия) не совпадёт со страной продавца (Вьетнам/Сингапур), инвайт не примется. Готовый аккаунт стоит на ~200 ₽ дороже, но работает сразу.
+                            </p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-rameev-border space-y-1">
+                            <div class="font-extrabold text-rameev-text">2. Страна аккаунта = ваш VPN</div>
+                            <p class="text-gray-600 leading-relaxed">
+                                Если у вас стабильный VPN в <strong>США</strong> — ищите прямо в названии товара штатовский аккаунт (USA). С российских аккаунтов Antigravity не пускает вообще.
+                            </p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-rose-300 space-y-1">
+                            <div class="font-extrabold text-rose-700">3. Ловушка «Pro / Plus»!</div>
+                            <p class="text-gray-600 leading-relaxed">
+                                Хитрые продавцы пишут на картинке и в заголовке <strong>Pro</strong>, а по умолчанию в селекторе товара стоит дешёвый <strong>Plus</strong> (где нет Argon/Hydrogen, а только старый урезанный Flash 3.8). Всегда проверяйте описание и выбирайте именно <strong>Pro</strong>!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Hardware Hack: OpenWRT + OpenClaw Micro-Agent -->
+                <div class="lg:col-span-5 bg-rameev-dark text-white rounded-2xl p-5 border border-rameev-sky/30 flex flex-col justify-between space-y-3">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-md bg-rameev-lime text-rameev-text font-mono text-[11px] font-extrabold">
+                                PRO-ИНЖЕНЕРИЯ ОТ ЮРИЯ
+                            </span>
+                            <span class="font-mono text-xs text-rameev-sky">OpenWRT + OpenClaw</span>
+                        </div>
+                        <h4 class="text-base font-black text-white">
+                            Авто-балансировка VPN-нод микро-агентом на роутере
+                        </h4>
+                        <p class="text-xs text-blue-100 leading-relaxed">
+                            Чтобы не переключать VPN вручную при блокировках, Юрий поставил на роутер с прошивкой <strong>OpenWRT</strong> микро-версию агента <strong>OpenClaw</strong> (занимает всего <strong>10 МБ</strong> на флеше и <strong>2 МБ в ОЗУ</strong>!).
+                        </p>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-3 text-[11px] font-mono text-blue-100 space-y-1 border border-white/10">
+                        <div>• Роутер (OpenClaw) &harr; Домашний сервер (Lubuntu + Kilo Code)</div>
+                        <div>• 2 подписки VPN &times; 30 нод: автоматическое переключение при падении</div>
+                        <div>• Трафик всех ИИ-агентов жёстко маршрутизируется только через ноды <strong>USA</strong></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-rameev-border mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+            <div class="flex items-center gap-3">
+                <span class="w-7 h-7 rounded-lg bg-rameev-blue text-white font-black flex items-center justify-center text-xs">ЦКР</span>
+                <span>Цифровой колледж им. Башира Рамеева · Кружок «Проектная деятельность: Инди-студия»</span>
+            </div>
+            <div class="flex items-center gap-4 font-mono">
+                <span>Спринт 03 (17.11.2026)</span>
+                <span>•</span>
+                <span class="text-rameev-blue font-bold">Kernel Valley: Урожай багов</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC & DATA
+         ========================================== -->
+    <script>
+        // ------------------------------------------
+        // 1. CHECKLIST DATA & STATE MANAGEMENT
+        // ------------------------------------------
+        const CHECKLIST_STORAGE_KEY = 'rameev_kernel_valley_sprint3_checklist_v1';
+
+        const checklistSteps = [
+            {
+                id: 'step-github-2fa',
+                num: '01',
+                title: 'Оформить профиль GitHub, принять инвайты на почте и включить 2FA',
+                badge: 'Безопасность и HR-лицо',
+                badgeColor: 'bg-rose-100 text-rose-800',
+                summary: 'Войти через Google, прислать свой username (серенький ник под именем), принять 2 письма на почте и включить двухфакторную аутентификацию.',
+                details: [
+                    '<strong>Профиль — ваше лицо перед HR:</strong> при отклике на любую IT-вакансию всегда просят ссылку на GitHub. Заполните аватарку, описание и держите открытые репозитории красивыми.',
+                    '<strong>Инвайт №1 (Организация):</strong> примите письмо на почте с приглашением в организацию <code class="font-mono text-rameev-blue font-bold">Rameev-College</code>.',
+                    '<strong>Инвайт №2 (Коллаборатор):</strong> примите доступ на запись (<code class="font-mono font-bold">Write</code>) в репозиторий <code class="font-mono text-rameev-blue font-bold">Kernel-Valley</code>.',
+                    '<strong>Обязательно включите 2FA (Двухфакторную аутентификацию):</strong> мы работаем в публичном репозитории. Если ваш пароль утечёт без 2FA, злоумышленники смогут заразить общий проект всей команды.'
+                ]
+            },
+            {
+                id: 'step-learngit',
+                num: '02',
+                title: 'Пройти интерактивный тренажёр Learn Git Branching',
+                badge: 'Обязательная база',
+                badgeColor: 'bg-blue-100 text-rameev-blue',
+                summary: 'Добить обучалку по веткам и удалённым репозиториям, чтобы на следующем созвоне мы говорили на одном языке.',
+                details: [
+                    'Откройте <a href="https://learngitbranching.js.org/?locale=ru_RU" target="_blank" class="text-rameev-blue underline font-semibold">learngitbranching.js.org</a> и пройдите базовые уровни: <code class="font-mono">commit</code>, <code class="font-mono">branch</code>, <code class="font-mono">checkout</code>, <code class="font-mono">merge</code>, <code class="font-mono">rebase</code>.',
+                    'Обязательно разберите вкладку <strong>«Удалённые репозитории»</strong> (<code class="font-mono">clone</code>, <code class="font-mono">fetch</code>, <code class="font-mono">pull</code>, <code class="font-mono">push</code>, что такое <code class="font-mono">origin/master</code>).',
+                    'Поймите разницу: каждый коммит хранит не файлы целиком заново, а только список изменений (дельту) относительно предыдущего коммита.'
+                ]
+            },
+            {
+                id: 'step-vscode-clone',
+                num: '03',
+                title: 'Установить VS Code и склонировать репозиторий Kernel-Valley',
+                badge: 'Рабочая среда',
+                badgeColor: 'bg-indigo-100 text-indigo-800',
+                summary: 'Связать свой браузерный аккаунт GitHub с VS Code и скачать проект в рабочую папку на компьютере.',
+                details: [
+                    '<strong>Совет по ОС:</strong> если планируете плотно заниматься вайб-кодингом и программированием — ставьте Linux (Ubuntu, Lubuntu или Mint). На Windows тоже всё работает, но придётся преодолевать больше мелких проблем.',
+                    'Создайте на рабочем столе пустую папку (например, <code class="font-mono">VibeCoding</code>) и откройте <strong>VS Code</strong>.',
+                    'Перейдите на вкладку <strong>Source Control</strong> (слева) &rarr; нажмите <strong>Clone Repository</strong> &rarr; <strong>Clone from GitHub</strong>.',
+                    'Подтвердите вход через браузер, выберите в поиске <code class="font-mono font-bold text-rameev-blue">Rameev-College/Kernel-Valley</code>, укажите свою папку и нажмите <strong>Open</strong>.'
+                ]
+            },
+            {
+                id: 'step-kilocode',
+                num: '04',
+                title: 'Установить официальный плагин Kilo Code и настроить Auto (Free)',
+                badge: 'ИИ-агент в IDE',
+                badgeColor: 'bg-emerald-100 text-emerald-800',
+                summary: 'Поставить верифицированный плагин Kilo Code (~1.7M скачиваний), выбрать бесплатный пул моделей и отключить авто-выполнение команд.',
+                details: [
+                    'Откройте вкладку <strong>Extensions</strong> (Плагины) в VS Code и введите <code class="font-mono font-bold">Kilo Code</code>.',
+                    '<strong>Внимание на подделки:</strong> выбирайте только официальный плагин с <strong>белой галочкой верификации</strong> и количеством скачиваний <strong>~1.7M</strong> (не ставьте клоны и Preview-версии!). После установки перезапустите VS Code.',
+                    'В настройках провайдера Kilo Code выберите режим <code class="font-mono font-bold text-emerald-700">Auto (Free)</code> — он сам подберёт подходящую бесплатную нейросеть.',
+                    '<strong>Правило безопасности:</strong> оставьте настройки разрешений по умолчанию (<strong>НЕ включайте Auto-approve</strong>). Всегда читайте, какую команду агент хочет запустить в терминале!'
+                ]
+            },
+            {
+                id: 'step-branch-push',
+                num: '05',
+                title: 'Переключиться в ветку своего отдела (или MVP), сделать Commit & Push',
+                badge: 'Результат спринта',
+                badgeColor: 'bg-rameev-lime text-rameev-text border border-rameev-blue/20',
+                summary: 'Загрузить свои наработки в нужную ветку с правильными расширениями файлов и отправить в облако GitHub.',
+                details: [
+                    '<strong>Не пушьте в <code class="font-mono text-rose-600">master</code>!</strong> Переключитесь в ветку своего отдела (<code class="font-mono">team-dev</code>, <code class="font-mono">team-gd</code>, <code class="font-mono">team-art</code>, <code class="font-mono">team-sound</code>) или создайте отдельную ветку для своей цельной игры (<code class="font-mono">mvp-фамилия</code>).',
+                    '<strong>Проверяйте расширения файлов:</strong> у каждого файла обязательно должно быть расширение (<code class="font-mono">.txt</code>, <code class="font-mono">.md</code>, <code class="font-mono">.png</code>, <code class="font-mono">.html</code>, <code class="font-mono">.js</code>), как мы исправили на занятии.',
+                    'Нажмите на иконку генерации описания коммита (через встроенный <strong>Copilot</strong> или <strong>Kilo Code</strong>), нажмите <strong>Commit</strong>, а затем <strong>Push</strong>.',
+                    'В течение недели перед началом работы делайте <code class="font-mono font-bold text-rameev-blue">git pull</code>, чтобы подтянуть свежие изменения коллег!'
+                ]
+            }
+        ];
+
+        let completedSteps = {};
+
+        function loadChecklistState() {
+            try {
+                const saved = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+                if (saved) {
+                    completedSteps = JSON.parse(saved);
+                }
+            } catch (e) {
+                completedSteps = {};
+            }
+        }
+
+        function saveChecklistState() {
+            try {
+                localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(completedSteps));
+            } catch (e) {}
+        }
+
+        function toggleStep(stepId) {
+            completedSteps[stepId] = !completedSteps[stepId];
+            saveChecklistState();
+            renderChecklist();
+        }
+
+        function resetChecklist() {
+            completedSteps = {};
+            saveChecklistState();
+            renderChecklist();
+            showToast('Прогресс чек-листа сброшен', 'info');
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist-items-container');
+            const total = checklistSteps.length;
+            const doneCount = checklistSteps.filter(s => completedSteps[s.id]).length;
+            const percent = Math.round((doneCount / total) * 100);
+
+            document.getElementById('checklist-counter').textContent = `${doneCount} / ${total} (${percent}%)`;
+            document.getElementById('checklist-bar').style.width = `${percent}%`;
+
+            const statusText = document.getElementById('checklist-status-text');
+            if (doneCount === 0) statusText.textContent = 'Начни с настройки GitHub и 2FA';
+            else if (doneCount < total) statusText.textContent = `Отличный темп! Осталось шагов: ${total - doneCount}`;
+            else statusText.textContent = '🎉 Все 5 шагов выполнены! Ты готов к ревью!';
+
+            container.innerHTML = checklistSteps.map(step => {
+                const isDone = !!completedSteps[step.id];
+                return `
+                    <div class="rounded-2xl border ${isDone ? 'border-emerald-400 bg-emerald-50/30' : 'border-rameev-border bg-rameev-bg/40 hover:border-rameev-sky'} p-4 sm:p-5 transition-all-custom">
+                        <div class="flex items-start gap-3.5 sm:gap-4">
+                            <button onclick="toggleStep('${step.id}')" class="mt-0.5 w-7 h-7 rounded-xl flex items-center justify-center border-2 transition-all shrink-0 ${isDone ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm' : 'bg-white border-rameev-blue/40 hover:border-rameev-blue text-transparent'}" aria-label="Отметить шаг ${step.num}">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+                            <div class="flex-grow">
+                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                    <span class="font-mono text-xs font-black text-rameev-blue">ШАГ ${step.num}</span>
+                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${step.badgeColor}">${step.badge}</span>
+                                    ${isDone ? '<span class="text-[11px] font-bold text-emerald-700 ml-auto"><i class="fa-solid fa-circle-check mr-1"></i>Выполнено</span>' : ''}
+                                </div>
+                                <h3 onclick="toggleStep('${step.id}')" class="text-base sm:text-lg font-extrabold cursor-pointer ${isDone ? 'line-through text-gray-500' : 'text-rameev-text hover:text-rameev-blue'} transition-colors">
+                                    ${step.title}
+                                </h3>
+                                <p class="text-xs sm:text-sm text-gray-600 mt-1">${step.summary}</p>
+                                <ul class="mt-3 space-y-1.5 text-xs text-gray-700 bg-white p-3.5 rounded-xl border border-rameev-border/80">
+                                    ${step.details.map(d => `<li class="flex items-start gap-2"><span class="text-rameev-blue font-bold mt-0.5">•</span><span>${d}</span></li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ------------------------------------------
+        // 2. GIT BRANCH EXPLORER DATA & LOGIC
+        // ------------------------------------------
+        const branchesData = {
+            'master': {
+                name: 'master',
+                title: 'Основная защищённая ветка (Production & Docs)',
+                badge: '🔒 Protected Branch',
+                badgeClass: 'bg-rose-100 text-rose-800 border-rose-300',
+                icon: 'fa-shield-halved',
+                color: 'text-rose-600',
+                accessRule: 'Прямой Push заблокирован для участников! Собираем и мержим в master только вместе на еженедельном созвоне с Юрием.',
+                members: ['Юрий Самплин (Тимлид / Системный архитектор)', 'Вся команда (только чтение и клонирование)'],
+                files: [
+                    { name: 'README.md', desc: 'Главное описание проекта Kernel Valley на GitHub' },
+                    { name: 'AGENTS.md', desc: 'Базовый файл памяти для ИИ-агентов (500 строк архитектуры, как запускать и тестировать)' },
+                    { name: '/sprints/*.html', desc: 'HTML-страницы спринтов (хостятся как онлайн-сайт через GitHub Pages)' },
+                    { name: '/docs/', desc: 'Общая документация и спецификации проекта' }
+                ],
+                gitCmd: 'git checkout master && git pull origin master'
+            },
+            'team-dev': {
+                name: 'team-dev',
+                title: 'Ветка отдела разработки (Dev & AI)',
+                badge: '💻 Отдел разработки',
+                badgeClass: 'bg-blue-100 text-rameev-blue border-blue-300',
+                icon: 'fa-code',
+                color: 'text-rameev-blue',
+                accessRule: 'Открыта на запись (Write). Сюда коммитим код игровых механик, сетку карты, экономику кукурузы и логику монстров.',
+                members: [
+                    'Головин Александр (26-01)',
+                    'Сырцев Илья (26-11)',
+                    'Анисимов Данила (26-01)',
+                    'Громова Ульяна (26-01 · совм. с Арт)',
+                    'Янгучина Алина (26-01 · +Звук)'
+                ],
+                files: [
+                    { name: '/src/grid/', desc: '2D-мир с видом сверху (тайловая сетка, перемещение ИБ-андроида)' },
+                    { name: '/src/economy/', desc: 'Механика посадки/сбора кремниевой кукурузы и баланс микросхем' },
+                    { name: '/src/combat/', desc: 'DDoS-монстры, баги, турели и модульная система здоровья узлов ГГ' },
+                    { name: '/src/drones/', desc: 'Интеграция окна рисования помощника (16x16) и конвейеров' }
+                ],
+                gitCmd: 'git checkout team-dev && git pull origin team-dev'
+            },
+            'team-gd': {
+                name: 'team-gd',
+                title: 'Ветка геймдизайна и нарратива (GD & Narrative)',
+                badge: '📜 Геймдизайн и лор',
+                badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+                icon: 'fa-scroll',
+                color: 'text-amber-600',
+                accessRule: 'Открыта на запись (Write). Оформляем сценарии, квесты, диалоги NPC и баланс в разметке Markdown (.md). Собраться отделом в Discord или GitHub Discussions!',
+                members: [
+                    'Губеев Рамзиль (26-02 · совм. с Арт)',
+                    'Куклин Александр (26-02)',
+                    'Бариев Руслан (26-01)'
+                ],
+                files: [
+                    { name: '/narrative/lore.md', desc: 'Лор «Кибер-деревни» и история списанного советского ИБ-андроида' },
+                    { name: '/narrative/npc_dialogs.md', desc: 'Характеры и реплики NPC (Ленивый Джун, Параноидальный Безопасник, Сисадмин)' },
+                    { name: '/quests/starter_quests.md', desc: '3 стартовых квеста (защита поля от эксплойтов, конвейер-фаервол, фишинг)' },
+                    { name: '/mechanics/drone_painter_spec.md', desc: 'Правила механики «Нарисуй себе помощника» (влияние цветов на статы)' }
+                ],
+                gitCmd: 'git checkout team-gd && git pull origin team-gd'
+            },
+            'team-art': {
+                name: 'team-art',
+                title: 'Ветка визуала, пиксель-арта и интерфейса (Art & UI)',
+                badge: '🎨 Арт и UI/UX',
+                badgeClass: 'bg-purple-100 text-purple-900 border-purple-300',
+                icon: 'fa-palette',
+                color: 'text-purple-600',
+                accessRule: 'Открыта на запись (Write). Загружаем спрайт-листы в .png, тайлы окружения и концепты интерфейса (включая окно рисования дрона).',
+                members: [
+                    'Концова Анастасия (26-02)',
+                    'Сагиров Данир (26-01)',
+                    'Громова Ульяна (26-01 · совм. с Dev)',
+                    'Губеев Рамзиль (26-02 · совм. с GD)'
+                ],
+                files: [
+                    { name: '/assets/sprites/hero_android.png', desc: 'Спрайт-лист главного героя (ИБ-андроид) и помощника в духе ВАЛЛ-И' },
+                    { name: '/assets/sprites/monsters_ddos.png', desc: 'Спрайты врагов: глючные баги, DDoS-монстры, воры кукурузы' },
+                    { name: '/assets/tiles/cyber_village.png', desc: 'Тайлы грядок кукурузы, конвейеров, будки-серверной и домиков' },
+                    { name: '/assets/ui/hud_concepts.png', desc: 'Макеты HUD, инвентаря и планшета рисования (Dark Mode / Liquid Glass)' }
+                ],
+                gitCmd: 'git checkout team-art && git pull origin team-art'
+            },
+            'team-sound': {
+                name: 'team-sound',
+                title: 'Ветка звука, медиа и тестирования (Sound, Media & QA)',
+                badge: '🎵 Звук и QA',
+                badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                icon: 'fa-headphones-simple',
+                color: 'text-emerald-600',
+                accessRule: 'Открыта на запись (Write). Складываем звуковые ассеты и чек-листы баг-репортов по итогам проверки веток коллег.',
+                members: [
+                    'Мосунова Надежда (26-01)',
+                    'Архиреев Григорий (26-11)',
+                    'Янгучина Алина (26-01 · музыкальные идеи)'
+                ],
+                files: [
+                    { name: '/audio/bgm/cyber_village_8bit.wav', desc: 'Фоновая ретро/8-битная тема кибер-деревни' },
+                    { name: '/audio/sfx/', desc: 'Звуки шагов андроида, посадки кукурузы, работы конвейера и сирены атаки вируса' },
+                    { name: '/qa/bug_reports_sprint3.md', desc: 'Отчёты о тестировании прототипов и проверке запускаемости билдов' }
+                ],
+                gitCmd: 'git checkout team-sound && git pull origin team-sound'
+            },
+            'my-mvp': {
+                name: 'my-mvp / mvp-*',
+                title: 'Персональные ветки цельных прототипов (Individual MVPs)',
+                badge: '🚀 Цельные игры',
+                badgeClass: 'bg-rameev-lime text-rameev-text border-rameev-blue/30',
+                icon: 'fa-rocket',
+                color: 'text-rameev-blue',
+                accessRule: 'Если у вас готов мощный цельный MVP (полноценная игра), НЕ нужно искусственно резать его на 4 ветки! Создайте под него свою ветку (например, mvp-sirtsev или mvp-golovin).',
+                members: [
+                    'Юрий Самплин (ветка my-mvp — демонстрационный прототип)',
+                    'Авторы комплексных играбельных прототипов из любого отдела'
+                ],
+                files: [
+                    { name: '/my_mvp_folder/index.html', desc: 'Полностью рабочий самодостаточный билд игры со всеми механиками' },
+                    { name: '/my_mvp_folder/README.md', desc: 'Список лучших фич прототипа, которые можно забрать в общую сборку студии' }
+                ],
+                gitCmd: 'git checkout -b mvp-surname && git push -u origin mvp-surname'
+            }
+        };
+
+        let activeBranchId = 'master';
+
+        function selectBranch(branchId) {
+            activeBranchId = branchId;
+            renderBranchList();
+            renderBranchInspector();
+        }
+
+        function renderBranchList() {
+            const listEl = document.getElementById('branch-buttons-list');
+            listEl.innerHTML = Object.keys(branchesData).map(id => {
+                const b = branchesData[id];
+                const isActive = id === activeBranchId;
+                return `
+                    <button onclick="selectBranch('${id}')" class="w-full text-left p-3.5 rounded-2xl border transition-all-custom flex items-center gap-3.5 relative z-10 ${isActive ? 'bg-rameev-blue text-white border-rameev-blue branch-node-active' : 'bg-white hover:bg-rameev-bg text-rameev-text border-rameev-border'}">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isActive ? 'bg-rameev-lime text-rameev-text' : 'bg-rameev-bg ' + b.color}">
+                            <i class="fa-solid ${b.icon}"></i>
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-mono font-bold text-sm truncate">${b.name}</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${isActive ? 'bg-white/20 text-white border-white/30' : b.badgeClass}">
+                                    ${id === 'master' ? 'Protected' : 'Write'}
+                                </span>
+                            </div>
+                            <div class="text-xs truncate mt-0.5 ${isActive ? 'text-blue-100' : 'text-gray-500'}">${b.title}</div>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderBranchInspector() {
+            const b = branchesData[activeBranchId];
+            const inspector = document.getElementById('branch-inspector');
+            inspector.innerHTML = `
+                <div class="space-y-5 animate-fadeIn">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-rameev-border pb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-rameev-bg border border-rameev-border flex items-center justify-center text-xl ${b.color}">
+                                <i class="fa-solid ${b.icon}"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono text-lg sm:text-xl font-black text-rameev-blue">${b.name}</span>
+                                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full border ${b.badgeClass}">${b.badge}</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-bold text-gray-700 mt-0.5">${b.title}</h3>
+                            </div>
+                        </div>
+                        <button onclick="copyText('${b.gitCmd}', 'Git-команда скопирована!')" class="px-3 py-2 rounded-xl bg-rameev-bg hover:bg-rameev-blue hover:text-white text-rameev-blue font-mono text-xs font-bold border border-rameev-border transition-colors flex items-center gap-1.5">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Скопировать git checkout</span>
+                        </button>
+                    </div>
+
+                    <!-- Access Rule Banner -->
+                    <div class="p-4 rounded-2xl ${activeBranchId === 'master' ? 'bg-rose-50 border border-rose-200 text-rose-900' : 'bg-blue-50/70 border border-rameev-sky/40 text-rameev-text'} text-xs sm:text-sm leading-relaxed flex items-start gap-3">
+                        <i class="fa-solid ${activeBranchId === 'master' ? 'fa-lock text-rose-600' : 'fa-circle-check text-rameev-blue'} text-base mt-0.5"></i>
+                        <div>
+                            <span class="font-extrabold">Регламент работы с веткой:</span> ${b.accessRule}
+                        </div>
+                    </div>
+
+                    <!-- Responsible Members -->
+                    <div>
+                        <div class="text-xs font-extrabold uppercase tracking-wider text-gray-400 mb-2">
+                            <i class="fa-solid fa-users mr-1 text-rameev-blue"></i> Участники и ответственные:
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            ${b.members.map(m => `
+                                <span class="px-3 py-1.5 rounded-xl bg-rameev-bg border border-rameev-border text-xs font-semibold text-rameev-text flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-rameev-blue"></span>
+                                    ${m}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Expected Files & Structure -->
+                    <div>
+                        <div class="text-xs font-extrabold uppercase tracking-wider text-gray-400 mb-2">
+                            <i class="fa-solid fa-folder-tree mr-1 text-rameev-blue"></i> Что должно лежать в этой ветке (обязательно с расширениями!):
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            ${b.files.map(f => `
+                                <div class="p-3 rounded-xl bg-rameev-bg/60 border border-rameev-border flex flex-col justify-between">
+                                    <span class="font-mono text-xs font-bold text-rameev-blue break-all">${f.name}</span>
+                                    <span class="text-xs text-gray-600 mt-1">${f.desc}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Terminal Command Bar -->
+                    <div class="terminal-window rounded-xl p-3.5 font-mono text-xs flex items-center justify-between gap-2">
+                        <div class="truncate">
+                            <span class="text-emerald-400">$</span> <span class="text-rameev-lime">${b.gitCmd}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 shrink-0">VS Code Terminal</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ------------------------------------------
+        // 3. GIT DELTA & DISCARD SIMULATOR
+        // ------------------------------------------
+        function setGitSimMode(mode) {
+            const btnDelta = document.getElementById('sim-btn-delta');
+            const btnDelete = document.getElementById('sim-btn-delete');
+            const display = document.getElementById('git-sim-display');
+
+            if (mode === 'delta') {
+                btnDelta.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-rameev-blue text-white transition-all';
+                btnDelete.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-gray-700 border border-rameev-border hover:border-rameev-blue transition-all';
+                display.innerHTML = `
+                    <div class="flex items-center justify-between text-slate-400 border-b border-slate-700 pb-1.5">
+                        <span>commit a8f42c1 · game_engine.js (Всего 1000 строк в файле)</span>
+                        <span class="text-emerald-400 font-bold">+2 строки / -1 строка</span>
+                    </div>
+                    <div class="text-slate-400">@@ -412,4 +412,5 @@ function spawnMonster(grid) {</div>
+                    <div class="text-slate-300">  const speed = 1.5;</div>
+                    <div class="bg-rose-950/80 text-rose-300 px-2 py-0.5 rounded">- const monsterType = "basic_bug";</div>
+                    <div class="bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded">+ const monsterType = "ddos_worm";</div>
+                    <div class="bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded">+ const shield = 25; // Новая броня монстра</div>
+                    <div class="text-slate-300">  return createEntity(monsterType, speed);</div>
+                    <div class="pt-2 text-[11px] text-rameev-lime border-t border-slate-700">
+                        💡 <strong>Экономия места:</strong> Git не перезагружает 998 неизменённых строк! В коммит улетают только 2 новые строчки и координаты вставки (строка 412).
+                    </div>
+                `;
+            } else {
+                btnDelete.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-rameev-blue text-white transition-all';
+                btnDelta.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-gray-700 border border-rameev-border hover:border-rameev-blue transition-all';
+                display.innerHTML = `
+                    <div class="flex items-center justify-between text-rose-300 border-b border-slate-700 pb-1.5">
+                        <span>⚠️ Вкладка Source Control: обнаружено удаление файла!</span>
+                        <span class="px-2 py-0.5 rounded bg-rose-900/60 text-rose-200 font-bold">D (Deleted)</span>
+                    </div>
+                    <div class="py-1 flex items-center justify-between bg-slate-800/80 px-3 rounded-lg">
+                        <span class="line-through text-rose-400">README.md (удалён из папки проводника)</span>
+                        <button onclick="restoreDeletedFileDemo()" class="px-2.5 py-1 rounded bg-rameev-lime text-rameev-text font-sans font-extrabold text-[11px] hover:bg-white transition-colors">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Отменить изменения (Discard)
+                        </button>
+                    </div>
+                    <div id="restore-status-msg" class="text-[11px] text-slate-300 pt-1">
+                        Папка <code class="text-rameev-lime">.git</code> помнит последнюю версию файла. Нажми кнопку «Отменить изменения», чтобы мгновенно вернуть его!
+                    </div>
+                `;
+            }
+        }
+
+        function restoreDeletedFileDemo() {
+            const msg = document.getElementById('restore-status-msg');
+            if (msg) {
+                msg.innerHTML = `<span class="text-emerald-400 font-bold">✅ Файл README.md мгновенно восстановлен из локальной базы .git! Никакой паники.</span>`;
+            }
+            showToast('Файл восстановлен из предыдущего коммита .git!', 'success');
+        }
+
+        // ------------------------------------------
+        // 4. READY-TO-COPY PROMPTS FOR KILO CODE
+        // ------------------------------------------
+        let currentPromptLang = 'en';
+
+        const promptsList = [
+            {
+                id: 'prompt-agents',
+                badge: 'Промпт №1 · Старт и память агента',
+                title: 'Анализ репозитория и генерация AGENTS.md',
+                desc: 'Запускаем первым делом после клонирования репо, чтобы Kilo Code изучил структуру и создал карту проекта.',
+                en: 'Analyze the current state of this repository, read existing sprint plans and MVP files, and write detailed documentation in README.md and AGENTS.md (project architecture, folder structure, how to run and test).',
+                ru: 'Проанализируй текущее состояние этого репозитория, изучи планы спринтов и MVP, напиши подробную документацию и заполни файл AGENTS.md (структура папок, как запускается и тестируется проект).'
+            },
+            {
+                id: 'prompt-branches',
+                badge: 'Промпт №2 · Командные ветки Git',
+                title: 'Создание веток для отделов студии',
+                desc: 'Чёткий промпт с опорой на относительный путь (Copy Relative Path), чтобы бесплатная модель не создала ветки по номерам спринтов.',
+                en: 'Create separate Git branches for our studio departments: team-dev, team-gd, team-art, and team-sound based on the department structure in sprints/sprint_2.html. Do not create branches named after sprints.',
+                ru: 'Создай отдельные ветки Git для команд нашей студии: team-dev, team-gd, team-art и team-sound. Возьми нужную инфу из папки спринтов (Copy Relative Path). Не создавай ветки по номерам спринтов.'
+            },
+            {
+                id: 'prompt-mvp-branch',
+                badge: 'Промпт №3 · Изоляция своего MVP + похвала',
+                title: 'Перенос своей готовой игры в отдельную ветку',
+                desc: 'Используем позитивное подкрепление («Отлично, спасибо!») и просим агента аккуратно вынести папку MVP из master в личную ветку.',
+                en: 'Great job, thank you! Now please move my MVP folder (my-mvp-2/) into a separate new Git branch named mvp-surname and remove this folder from the master branch so master stays clean.',
+                ru: 'Отлично, спасибо! Теперь, пожалуйста, перенеси папку с моим прототипом (my-mvp-2/) в отдельную новую ветку mvp-фамилия и убери её из основной ветки master.'
+            }
+        ];
+
+        function togglePromptLang(lang) {
+            currentPromptLang = lang;
+            const btnEn = document.getElementById('lang-btn-en');
+            const btnRu = document.getElementById('lang-btn-ru');
+            if (lang === 'en') {
+                btnEn.className = 'px-3 py-1.5 rounded-lg bg-rameev-blue text-white transition-all';
+                btnRu.className = 'px-3 py-1.5 rounded-lg text-gray-600 hover:text-rameev-blue transition-all';
+            } else {
+                btnRu.className = 'px-3 py-1.5 rounded-lg bg-rameev-blue text-white transition-all';
+                btnEn.className = 'px-3 py-1.5 rounded-lg text-gray-600 hover:text-rameev-blue transition-all';
+            }
+            renderPrompts();
+        }
+
+        function renderPrompts() {
+            const container = document.getElementById('prompts-container');
+            if (!container) return;
+            container.innerHTML = promptsList.map((p, idx) => {
+                const textToUse = currentPromptLang === 'en' ? p.en : p.ru;
+                return `
+                    <div class="rounded-2xl p-5 bg-rameev-bg/60 border border-rameev-border flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white text-rameev-blue border border-rameev-border">
+                                ${p.badge}
+                            </span>
+                            <h4 class="text-base font-extrabold text-rameev-text">${p.title}</h4>
+                            <p class="text-xs text-gray-600 leading-relaxed">${p.desc}</p>
+                        </div>
+                        <div class="space-y-2.5">
+                            <div class="terminal-window rounded-xl p-3 font-mono text-[11px] text-slate-200 leading-relaxed border border-slate-700">
+                                "${textToUse}"
+                            </div>
+                            <button onclick="copyPromptByIndex(${idx})" class="w-full py-2.5 px-3 rounded-xl bg-rameev-blue hover:bg-rameev-dark text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-regular fa-copy"></i>
+                                <span>Скопировать промпт (${currentPromptLang.toUpperCase()})</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function copyPromptByIndex(idx) {
+            const p = promptsList[idx];
+            if (!p) return;
+            const text = currentPromptLang === 'en' ? p.en : p.ru;
+            copyText(text, `Промпт №${idx + 1} (${currentPromptLang.toUpperCase()}) скопирован!`);
+        }
+
+        // ------------------------------------------
+        // 5. DEPARTMENT TASKS DATA & FILTERING
+        // ------------------------------------------
+        const deptTasksData = [
+            {
+                dept: 'dev',
+                branch: 'team-dev (или mvp-*)',
+                title: '💻 Отдел разработки (Dev & AI)',
+                badgeColor: 'bg-blue-100 text-rameev-blue border-blue-200',
+                members: 'Головин Александр, Сырцев Илья, Анисимов Данила, Громова Ульяна (+Арт), Янгучина Алина (+Звук)',
+                tasks: [
+                    'Склонировать <code class="font-mono font-bold">Kernel-Valley</code> в VS Code и изучить сгенерированный <code class="font-mono font-bold">AGENTS.md</code>.',
+                    'Если у вас цельный рабочий MVP (готовая игра со своими механиками) — вынести его в отдельную ветку <code class="font-mono font-bold">mvp-фамилия</code>, чтобы мы могли подтаскивать лучшие фичи в общий билд.',
+                    'В ветке <code class="font-mono font-bold">team-dev</code>: докрутить 2D-сетку поля, посадку/сбор кремниевой кукурузы и баланс микросхем с помощью плагина <strong>Kilo Code (Auto-Free)</strong>.',
+                    'Добавить новый вид DDoS-монстров/багов и сделать <code class="font-mono font-bold">Commit & Push</code> с авто-описанием через Kilo Code.'
+                ]
+            },
+            {
+                dept: 'gd',
+                branch: 'team-gd',
+                title: '📜 Отдел геймдизайна и нарратива (GD & Narrative)',
+                badgeColor: 'bg-amber-100 text-amber-900 border-amber-200',
+                members: 'Губеев Рамзиль (+Арт), Куклин Александр, Бариев Руслан',
+                tasks: [
+                    '<strong>Собраться отделом в Discord</strong> (или в разделе GitHub Discussions, который включит Юрий) и синхронизировать сюжетные идеи.',
+                    'Освоить разметку <strong>Markdown (<code class="font-mono">.md</code>)</strong>: заголовки <code class="font-mono">#</code>, цитаты <code class="font-mono">&gt;</code> и текстовые таблицы <code class="font-mono">| |</code>.',
+                    'Оформить и запушить в ветку <code class="font-mono font-bold">team-gd</code> файлы <code class="font-mono">lore.md</code>, <code class="font-mono">npc_dialogs.md</code> и <code class="font-mono">starter_quests.md</code> (3 квеста + спецификация механики «Нарисуй себе помощника»).',
+                    'Следить, чтобы у каждого созданного документа обязательно было расширение <code class="font-mono font-bold">.md</code>!'
+                ]
+            },
+            {
+                dept: 'art',
+                branch: 'team-art',
+                title: '🎨 Арт-отдел и UI/UX (Art & Visuals)',
+                badgeColor: 'bg-purple-100 text-purple-900 border-purple-200',
+                members: 'Концова Анастасия, Сагиров Данир, Громова Ульяна (совм.), Губеев Рамзиль (совм.)',
+                tasks: [
+                    'Переключиться в ветку <code class="font-mono font-bold">team-art</code> в VS Code (или загрузить файлы через веб-интерфейс GitHub строго с выбором ветки <code class="font-mono">team-art</code>, не в <code class="font-mono">master</code>!).',
+                    'Загрузить 2D pixel-art спрайты главного героя (ИБ-андроид), дрона-помощника в духе ВАЛЛ-И и врагов (DDoS-монстры, баги).',
+                    'Добавить тайлы окружения «Кибер-деревни» (кремниевая кукуруза, конвейеры, серверная будка) и макет окна рисования 16×16 / 32×32.',
+                    'Проверить расширения всех графических файлов (<code class="font-mono">.png</code>, <code class="font-mono">.svg</code>) и понятные названия на латинице.'
+                ]
+            },
+            {
+                dept: 'sound',
+                branch: 'team-sound',
+                title: '🎵 Звук, медиа и тестирование (Sound, Media & QA)',
+                badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-200',
+                members: 'Мосунова Надежда, Архиреев Григорий (+музыкальные идеи от Янгучиной Алины)',
+                tasks: [
+                    'Выгрузить в ветку <code class="font-mono font-bold">team-sound</code> сгенерированные или записанные 8-битные мелодии кибер-деревни и базовый пак SFX (шаги, посадка, конвейер, сирена вируса).',
+                    'Практика QA через Git: делать <code class="font-mono font-bold">git pull</code> и переключаться по веткам коллег (<code class="font-mono">team-dev</code>, <code class="font-mono">my-mvp</code>), проверяя, запускаются ли их <code class="font-mono">index.html</code>.',
+                    'Оформить найденные баги и предложения по улучшению в файле <code class="font-mono font-bold">qa/bug_reports_sprint3.md</code> в разметке Markdown.',
+                    'Протестировать связку VS Code + Kilo Code (или Antigravity Pro по гайду из Q&A) для автоматизации рутинных задач.'
+                ]
+            }
+        ];
+
+        function filterDeptTasks(dept) {
+            document.querySelectorAll('.dept-filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-dept-btn') === dept) {
+                    btn.className = 'dept-filter-btn px-3 py-2 rounded-xl bg-rameev-blue text-white shadow-sm transition-all';
+                } else {
+                    btn.className = 'dept-filter-btn px-3 py-2 rounded-xl text-gray-700 hover:bg-white transition-all';
+                }
+            });
+            renderDeptTasks(dept);
+        }
+
+        function renderDeptTasks(filter) {
+            const grid = document.getElementById('dept-tasks-grid');
+            if (!grid) return;
+            const filtered = filter === 'all' ? deptTasksData : deptTasksData.filter(d => d.dept === filter);
+
+            grid.innerHTML = filtered.map(item => `
+                <div class="rounded-2xl p-5 sm:p-6 bg-rameev-bg/50 border border-rameev-border flex flex-col justify-between space-y-4 hover:border-rameev-sky transition-all">
+                    <div class="space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-lg font-black text-rameev-text">${item.title}</h3>
+                            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-lg border ${item.badgeColor}">
+                                <i class="fa-solid fa-code-branch mr-1"></i>${item.branch}
+                            </span>
+                        </div>
+                        <div class="text-xs text-gray-600 bg-white px-3 py-2 rounded-xl border border-rameev-border">
+                            <strong class="text-rameev-blue">Состав отдела:</strong> ${item.members}
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-gray-700 pt-1">
+                            ${item.tasks.map(t => `
+                                <li class="flex items-start gap-2.5">
+                                    <i class="fa-solid fa-circle-chevron-right text-rameev-blue mt-1 text-xs shrink-0"></i>
+                                    <span>${t}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                    <div class="pt-3 border-t border-rameev-border/80 flex items-center justify-between text-[11px] text-gray-500">
+                        <span>Режим работы: 24/7 через Git Pull / Push</span>
+                        <span class="font-bold text-rameev-blue">Дедлайн: к вторнику (24.11)</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ------------------------------------------
+        // 6. PREVIOUS SPRINTS SUMMARY MODAL
+        // ------------------------------------------
+        const pastSprintsInfo = {
+            1: {
+                title: 'Спринт 01 (03.11.2026) · Открытие Инди-студии и концепт',
+                subtitle: 'Оцифровка команды (12 человек), распределение по 4 отделам и рождение концепта «Kernel Valley»',
+                points: [
+                    'Определили флагманский сеттинг: гибрид уютной фермы (Stardew Valley), автоматизации конвейеров (Factorio) и симулятора информационной безопасности.',
+                    'Главный герой — списанный советский ИБ-андроид, защищающий плантации кремниевой кукурузы и микросхем от вирусов и DDoS-атак.',
+                    'Сформировали 4 отдела студии (Dev, GD, Art, Sound/QA) с резервными ролями и провели первое знакомство с быстрой сборкой AI-прототипов.'
+                ]
+            },
+            2: {
+                title: 'Спринт 02 (10.11.2026) · Первые MVP и введение в Git',
+                subtitle: 'Плейтест 4 индивидуальных прототипов, выбор 2D Pixel-Art Top-Down и старт обучения Git',
+                points: [
+                    'Провели живой разбор первых работ: от 2D-фермы с магазином и DDoS-монстрами до 3D-воксельного комбайна и полноценного HTML-прототипа с конвейерами, турелями и встроенной IDE.',
+                    'Утвердили единый визуальный стиль (2D Pixel-Art с видом сверху) и киллер-фичу: внутриигровое окно 16×16 «Нарисуй себе дрона-помощника».',
+                    'Объяснили разницу между локальным Git и облачным GitHub, выдали задание зарегистрироваться на GitHub и пройти тренажёр Learn Git Branching.'
+                ]
+            }
+        };
+
+        function openSprintModal(sprintNum) {
+            const modal = document.getElementById('sprint-modal');
+            const content = document.getElementById('sprint-modal-content');
+            const info = pastSprintsInfo[sprintNum];
+            if (!modal || !content || !info) return;
+
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">
+                        <i class="fa-solid fa-circle-check"></i> Завершённый этап
+                    </div>
+                    <h3 class="text-xl font-black text-rameev-text pr-8">${info.title}</h3>
+                    <p class="text-xs sm:text-sm font-semibold text-rameev-blue bg-rameev-bg p-3 rounded-xl border border-rameev-border">
+                        ${info.subtitle}
+                    </p>
+                    <ul class="space-y-2 text-xs sm:text-sm text-gray-700">
+                        ${info.points.map(pt => `
+                            <li class="flex items-start gap-2">
+                                <span class="text-rameev-blue font-bold">•</span>
+                                <span>${pt}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <div class="pt-2 flex justify-end">
+                        <button onclick="closeSprintModal()" class="px-4 py-2 rounded-xl bg-rameev-blue text-white text-xs font-bold hover:bg-rameev-dark transition-colors">
+                            Понятно, вернуться к Спринту 3
+                        </button>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSprintModal() {
+            const modal = document.getElementById('sprint-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // ------------------------------------------
+        // 7. CLIPBOARD HELPER & TOAST NOTIFICATIONS
+        // ------------------------------------------
+        function copyText(text, successMsg) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg || 'Скопировано в буфер обмена!', 'success');
+            } catch (err) {
+                showToast('Не удалось скопировать текст', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-rameev-dark text-white border-rameev-lime' : 'bg-rameev-blue text-white border-white';
+            toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl border-l-4 ${bgClass} text-xs font-bold flex items-center gap-2.5 transition-all duration-300`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check text-rameev-lime' : 'fa-circle-info text-rameev-sky'} text-sm"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2600);
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('sprint-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeSprintModal();
+        });
+
+        // ------------------------------------------
+        // INITIALIZE PAGE ON LOAD
+        // ------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            loadChecklistState();
+            renderChecklist();
+            renderBranchList();
+            renderBranchInspector();
+            setGitSimMode('delta');
+            renderPrompts();
+            renderDeptTasks('all');
+        });
+    </script>
+</body>
+</html>
