@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Встреча №2: Питчинг MVP и магия Git — Инди-студия Колледжа Рамеева</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rameev: {
+              blue: '#7199F1',
+              ink: '#2149A1',
+              soft: '#E5ECFA',
+              lime: '#EFFE74',
+              surface: '#F4F5F7',
+              dark: '#222222',
+              term: '#161B26'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F4F5F7;
+      color: #222222;
+      overflow-x: hidden;
+    }
+
+    /* Кастомные анимации для интерактивных мультиков */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(113, 153, 241, 0.5); }
+      50% { box-shadow: 0 0 0 10px rgba(113, 153, 241, 0); }
+    }
+    @keyframes androidPatrol {
+      0% { transform: translateX(0px); }
+      45% { transform: translateX(70px); }
+      50% { transform: translateX(70px) scaleX(-1); }
+      95% { transform: translateX(0px) scaleX(-1); }
+      100% { transform: translateX(0px) scaleX(1); }
+    }
+    @keyframes monsterCrazy {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      25% { transform: translate(-80px, -25px) rotate(-12deg) scale(1.15); }
+      50% { transform: translate(60px, 20px) rotate(15deg) scale(0.95); }
+      75% { transform: translate(-50px, 30px) rotate(-8deg) scale(1.2); }
+      100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+    @keyframes screenShake {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-5px, 3px); }
+      40% { transform: translate(5px, -4px); }
+      60% { transform: translate(-4px, -2px); }
+      80% { transform: translate(4px, 4px); }
+    }
+    @keyframes packetFly {
+      0% { offset-distance: 0%; opacity: 0; transform: scale(0.6); }
+      15% { opacity: 1; transform: scale(1); }
+      85% { opacity: 1; transform: scale(1); }
+      100% { offset-distance: 100%; opacity: 0; transform: scale(0.6); }
+    }
+    @keyframes eqBar {
+      0%, 100% { height: 6px; }
+      50% { height: 22px; }
+    }
+    @keyframes dashFlow {
+      to { stroke-dashoffset: -40; }
+    }
+
+    .anim-float { animation: floatSlow 3s ease-in-out infinite; }
+    .anim-patrol { animation: androidPatrol 4.5s ease-in-out infinite; }
+    .anim-monster-crazy { animation: monsterCrazy 0.45s linear infinite; }
+    .anim-shake { animation: screenShake 0.35s ease-in-out infinite; }
+    .anim-dash { stroke-dasharray: 8 6; animation: dashFlow 1.2s linear infinite; }
+
+    /* Пиксельная сетка для игрового экрана Kernel Valley */
+    .pixel-grid-bg {
+      background-color: #1A241E;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* Плавные переходы для сцен мультиков */
+    .stage-transition {
+      transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Стилизация скроллбара */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #F4F5F7; }
+    ::-webkit-scrollbar-thumb { background: #7199F1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2149A1; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-rameev-lime selection:text-rameev-dark">
+
+  <!-- ВЕРХНЯЯ НАВИГАЦИОННАЯ ПАНЕЛЬ + БЛИЦ-ТАЙМЕР ПИТЧИНГА -->
+  <header class="sticky top-0 z-50 bg-rameev-dark/95 backdrop-blur-md border-b border-white/10 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Логотип и название встречи -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rameev-blue flex items-center justify-center text-rameev-dark font-black text-lg shadow-inner">
+          <i class="fa-solid fa-gamepad"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-rameev-lime text-rameev-dark font-bold">Встреча №2</span>
+            <span class="text-xs text-gray-300 hidden sm:inline">Колледж им. Б. Рамеева</span>
+          </div>
+          <h1 class="text-sm sm:text-base font-bold leading-tight text-white">Инди-студия: «Kernel Valley» &amp; Магия Git</h1>
+        </div>
+      </div>
+
+      <!-- Быстрые вкладки по этапам занятия -->
+      <nav class="hidden lg:flex items-center gap-1.5 bg-white/5 p-1.5 rounded-xl border border-white/10 text-xs font-semibold">
+        <a href="#sec-pitch" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition flex items-center gap-1.5 text-gray-200 hover:text-white">
+          <i class="fa-solid fa-microphone-lines text-rameev-lime"></i> 1. Питчинг MVP (12)
+        </a>
+        <a href="#sec-cartoons" class="px-3 py-1.5 rounded-lg bg-rameev-blue/25 text-rameev-lime border border-rameev-blue/40 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-film"></i> 2. Интерактивные мультики (4)
+        </a>
+        <a href="#sec-dictionary" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition flex items-center gap-1.5 text-gray-200 hover:text-white">
+          <i class="fa-solid fa-book-journal-whills text-rameev-blue"></i> 3. Словарь &amp; Отделы
+        </a>
+        <a href="#sec-sandbox" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition flex items-center gap-1.5 text-gray-200 hover:text-white">
+          <i class="fa-solid fa-code-branch text-emerald-400"></i> 4. Тренажёр &amp; ДЗ
+        </a>
+      </nav>
+
+      <!-- Мини-пульт таймера выступления студента (2:00) -->
+      <div class="flex items-center gap-2 bg-[#161B26] px-3 py-1.5 rounded-xl border border-white/15">
+        <div class="text-right">
+          <div id="pitch-speaker-label" class="text-[10px] font-mono text-gray-400 truncate max-w-[130px]">Таймер питча (2 мин)</div>
+          <div id="pitch-timer-display" class="font-mono text-base font-bold text-rameev-lime leading-none">02:00</div>
+        </div>
+        <button onclick="togglePitchTimer()" id="pitch-timer-btn" class="px-2.5 py-1.5 rounded-lg bg-rameev-blue hover:bg-rameev-ink text-white text-xs font-bold transition flex items-center gap-1" title="Старт/Пауза таймера питча">
+          <i class="fa-solid fa-play" id="pitch-timer-icon"></i>
+        </button>
+        <button onclick="resetPitchTimer()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 text-xs transition" title="Сбросить на 02:00">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ГЛАВНЫЙ КОНТЕНТ -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-12">
+
+    <!-- ГЕРОЙ-БАННЕР ВСТРЕЧИ -->
+    <section class="relative rounded-3xl bg-rameev-dark text-white p-6 sm:p-10 overflow-hidden shadow-xl border border-white/10">
+      <div class="absolute -right-16 -top-16 w-80 h-80 bg-rameev-blue/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute right-1/4 -bottom-20 w-72 h-72 bg-rameev-lime/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-mono text-rameev-lime">
+            <span class="w-2 h-2 rounded-full bg-rameev-lime animate-ping"></span>
+            Проект студии: «Kernel Valley: Урожай багов»
+          </div>
+          <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+            От 12 разных прототипов — к&nbsp;<span class="text-rameev-lime underline decoration-rameev-blue decoration-4 underline-offset-4">единой игре в&nbsp;Git</span>
+          </h2>
+          <p class="text-gray-300 text-base sm:text-lg leading-relaxed max-w-2xl">
+            Сегодня сначала смотрим ваши первые MVP и&nbsp;наработки по&nbsp;отделам, а&nbsp;затем на&nbsp;четырёх пошаговых интерактивных мультиках разбираем, как объединить код, пиксель-арт, сюжет и&nbsp;звук в&nbsp;общем репозитории без потерь и&nbsp;хаоса.
+          </p>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <a href="#sec-pitch" class="px-5 py-3 rounded-xl bg-white text-rameev-dark font-bold text-sm hover:bg-gray-100 transition flex items-center gap-2 shadow">
+              <i class="fa-solid fa-users-viewfinder text-rameev-ink"></i> Начать смотр MVP (Часть 1)
+            </a>
+            <a href="#sec-cartoons" class="px-5 py-3 rounded-xl bg-rameev-blue text-white font-bold text-sm hover:bg-rameev-ink transition flex items-center gap-2 shadow-lg">
+              <i class="fa-solid fa-clapperboard text-rameev-lime"></i> Запустить мультики про Git (Часть 2)
+            </a>
+          </div>
+        </div>
+
+        <!-- Мини-карточка живого превью концепта игры -->
+        <div class="lg:col-span-5 bg-[#161B26] rounded-2xl p-5 border border-white/15 shadow-2xl">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-400"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+              <span class="text-xs font-mono text-gray-400 ml-1">kernel_valley_concept.exe</span>
+            </div>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">2D Top-Down RPG</span>
+          </div>
+
+          <!-- Иллюстрация ИБ-андроида, кукурузы и DDoS-монстра -->
+          <div class="pixel-grid-bg rounded-xl p-4 h-44 relative overflow-hidden flex items-center justify-around border border-white/10">
+            <!-- Грядка кукурузы -->
+            <div class="flex flex-col items-center gap-1 z-10">
+              <div class="w-14 h-14 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-3xl shadow-inner anim-float">
+                🌽
+              </div>
+              <span class="text-[11px] font-mono text-amber-300 bg-black/50 px-2 py-0.5 rounded">Урожай данных</span>
+            </div>
+
+            <!-- Советский ИБ-Андроид (SVG) -->
+            <div class="flex flex-col items-center gap-1 z-10">
+              <div class="w-16 h-16 rounded-2xl bg-rameev-blue/20 border-2 border-rameev-blue flex items-center justify-center shadow-lg">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                  <!-- Антенна и звезда -->
+                  <rect x="20" y="2" width="4" height="6" fill="#7199F1"/>
+                  <polygon points="22,6 24,10 20,10" fill="#EF4444"/>
+                  <!-- Голова андроида -->
+                  <rect x="10" y="8" width="24" height="16" rx="3" fill="#7199F1" stroke="#FFFFFF" stroke-width="2"/>
+                  <!-- Визор -->
+                  <rect x="14" y="13" width="16" height="5" rx="1" fill="#EFFE74"/>
+                  <!-- Корпус со щитом ИБ -->
+                  <rect x="12" y="26" width="20" height="14" rx="2" fill="#2149A1" stroke="#7199F1" stroke-width="2"/>
+                  <path d="M22 29 L26 31 V35 C26 37 22 38 22 38 C22 38 18 37 18 35 V31 L22 29 Z" fill="#EFFE74"/>
+                </svg>
+              </div>
+              <span class="text-[11px] font-mono text-rameev-lime bg-black/60 px-2 py-0.5 rounded font-bold">ИБ-Андроид</span>
+            </div>
+
+            <!-- DDoS-монстр -->
+            <div class="flex flex-col items-center gap-1 z-10">
+              <div class="w-14 h-14 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-3xl anim-float" style="animation-delay: 0.7s;">
+                👾
+              </div>
+              <span class="text-[11px] font-mono text-red-300 bg-black/50 px-2 py-0.5 rounded">DDoS-монстр</span>
+            </div>
+          </div>
+
+          <div class="mt-3 grid grid-cols-4 gap-2 text-center text-xs">
+            <div class="bg-white/5 rounded-lg p-2">
+              <div class="font-bold text-rameev-blue">5 чел.</div>
+              <div class="text-[11px] text-gray-400">Разработка</div>
+            </div>
+            <div class="bg-white/5 rounded-lg p-2">
+              <div class="font-bold text-purple-400">4 чел.</div>
+              <div class="text-[11px] text-gray-400">Арт &amp; UI</div>
+            </div>
+            <div class="bg-white/5 rounded-lg p-2">
+              <div class="font-bold text-amber-400">3 чел.</div>
+              <div class="text-[11px] text-gray-400">Геймдизайн</div>
+            </div>
+            <div class="bg-white/5 rounded-lg p-2">
+              <div class="font-bold text-emerald-400">2+1 чел.</div>
+              <div class="text-[11px] text-gray-400">Звук &amp; QA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ЧАСТЬ 1: БЛИЦ-ПИТЧИНГ MVP И ЧЕК-ЛИСТ КОМАНДЫ (12 УЧАСТНИКОВ)           -->
+    <!-- ===================================================================== -->
+    <section id="sec-pitch" class="scroll-mt-20 space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-rameev-ink mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-stopwatch"></i> Часть 1 · 00:00–22:00 (по 1,5–2 минуты на человека)
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-rameev-dark">Смотр первых MVP и&nbsp;наработок по&nbsp;отделам</h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Нажимай на&nbsp;карточку участника, чтобы включить персональный таймер на&nbsp;2&nbsp;минуты и&nbsp;отметить показанный прототип.
+          </p>
+        </div>
+
+        <!-- Прогресс питчинга -->
+        <div class="flex items-center gap-4 bg-rameev-surface px-4 py-3 rounded-xl border border-gray-200 shrink-0">
+          <div>
+            <div class="text-xs text-gray-500 font-medium">Показали работы:</div>
+            <div class="text-xl font-black text-rameev-ink"><span id="pitched-count">0</span> / 12 участников</div>
+          </div>
+          <button onclick="markAllPitched()" class="px-3 py-2 rounded-lg bg-rameev-soft hover:bg-rameev-blue hover:text-white text-rameev-ink text-xs font-bold transition">
+            Отметить всех
+          </button>
+        </div>
+      </div>
+
+      <!-- Сетка 4 отделов -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="departments-grid">
+        <!-- Заполняется из JS для интерактивности -->
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ЧАСТЬ 2: 4 ИНТЕРАКТИВНЫХ МУЛЬТИКА С ПУЛЬТАМИ УПРАВЛЕНИЯ                -->
+    <!-- ===================================================================== -->
+    <section id="sec-cartoons" class="scroll-mt-20 space-y-10">
+      <div class="bg-rameev-dark text-white p-6 sm:p-8 rounded-3xl shadow-lg border border-white/10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-rameev-lime">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Часть 2 · 22:00–40:00 · Интерактивные демонстрации
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold">4 интерактивных мультика: зачем нам Git и&nbsp;GitHub</h2>
+          <p class="text-gray-300 text-sm sm:text-base max-w-3xl">
+            У каждого окна свой пульт: нажми <span class="px-2 py-0.5 rounded bg-rameev-blue text-white font-mono text-xs">▶ Старт</span> для автоматического мультика или переключай кадры вручную кнопками <span class="px-2 py-0.5 rounded bg-white/15 font-mono text-xs">◀ Шаг</span> / <span class="px-2 py-0.5 rounded bg-white/15 font-mono text-xs">Шаг ▶</span>, чтобы комментировать голосом.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 shrink-0">
+          <a href="#cartoon-box-1" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition">🎬 1. Краш-тест в чате</a>
+          <a href="#cartoon-box-2" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition">🚀 2. GitHub Pages</a>
+          <a href="#cartoon-box-3" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition">⏪ 3. Diff &amp; Revert</a>
+          <a href="#cartoon-box-4" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition">🌿 4. Ветки &amp; Merge</a>
+        </div>
+      </div>
+
+      <!-- Контейнер, в который рендерятся 4 интерактивных окна мультиков с пультами -->
+      <div id="cartoons-wrapper" class="space-y-12"></div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ЧАСТЬ 3: ГЕЙМЕРСКИЙ СЛОВАРЬ GIT И ВЫГОДА ДЛЯ КАЖДОГО ОТДЕЛА            -->
+    <!-- ===================================================================== -->
+    <section id="sec-dictionary" class="scroll-mt-20 space-y-8">
+      <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-200 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-rameev-ink mb-1">Шпаргалка без скучной теории</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-rameev-dark">Словарь Git на&nbsp;языке геймера</h2>
+          </div>
+          <span class="text-xs text-gray-500">Нажми на любую карточку, чтобы увидеть пример из «Kernel Valley»</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Термин 1: Repo -->
+          <div onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-rameev-ink')" class="cursor-pointer bg-rameev-surface hover:bg-rameev-soft/60 transition p-5 rounded-2xl border border-gray-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-rameev-dark text-rameev-lime">Repository (Repo)</span>
+                <i class="fa-solid fa-dungeon text-xl text-rameev-ink"></i>
+              </div>
+              <h3 class="text-lg font-extrabold text-rameev-dark mb-1">Облачная база клана</h3>
+              <p class="text-sm text-gray-600">Общий сундук студии на&nbsp;GitHub, где лежит самый свежий билд игры, все спрайты, звуки и&nbsp;диалоги.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-200/80 text-xs font-mono text-rameev-ink">
+              📦 github.com/rameev-studio/kernel-valley
+            </div>
+          </div>
+
+          <!-- Термин 2: Commit -->
+          <div onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-rameev-ink')" class="cursor-pointer bg-rameev-surface hover:bg-rameev-soft/60 transition p-5 rounded-2xl border border-gray-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-rameev-dark text-rameev-lime">Commit (Коммит)</span>
+                <i class="fa-solid fa-floppy-disk text-xl text-rameev-ink"></i>
+              </div>
+              <h3 class="text-lg font-extrabold text-rameev-dark mb-1">Точка сохранения (Save)</h3>
+              <p class="text-sm text-gray-600">Сейв перед боссом с&nbsp;понятной подписью. Если дальше всё сломалось — загружаем сейв в&nbsp;один клик.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-200/80 text-xs font-mono text-rameev-ink">
+              💾 git commit -m "Добавил посадку кукурузы"
+            </div>
+          </div>
+
+          <!-- Термин 3: Branch -->
+          <div onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-rameev-ink')" class="cursor-pointer bg-rameev-surface hover:bg-rameev-soft/60 transition p-5 rounded-2xl border border-gray-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-rameev-dark text-rameev-lime">Branch (Ветка)</span>
+                <i class="fa-solid fa-code-branch text-xl text-rameev-ink"></i>
+              </div>
+              <h3 class="text-lg font-extrabold text-rameev-dark mb-1">Параллельная вселенная</h3>
+              <p class="text-sm text-gray-600">Личная песочница: Илья делает экономику, а&nbsp;Данила — монстров, и&nbsp;никто не&nbsp;ломает основной мир <code class="font-mono">main</code>.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-200/80 text-xs font-mono text-rameev-ink">
+              🌿 git branch feature/ddos-monsters
+            </div>
+          </div>
+
+          <!-- Термин 4: Pull Request & Merge -->
+          <div onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-rameev-ink')" class="cursor-pointer bg-rameev-surface hover:bg-rameev-soft/60 transition p-5 rounded-2xl border border-gray-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-rameev-dark text-rameev-lime">Pull Request &amp; Merge</span>
+                <i class="fa-solid fa-shield-halved text-xl text-rameev-ink"></i>
+              </div>
+              <h3 class="text-lg font-extrabold text-rameev-dark mb-1">Фейсконтроль перед патчем</h3>
+              <p class="text-sm text-gray-600">Заявка на&nbsp;слияние твоей ветки с&nbsp;основной игрой после проверки отделом QA.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-200/80 text-xs font-mono text-emerald-700 font-bold">
+              ✅ Merge Pull Request #12 -> main
+            </div>
+          </div>
+        </div>
+
+        <!-- Интерактивный блок: Зачем GitHub НЕ-программистам (с живым ползунком сравнения спрайтов для художников!) -->
+        <div class="pt-4 border-t border-gray-200 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-7 space-y-3">
+            <div class="text-xs font-bold uppercase tracking-wider text-rameev-ink">Не только для кода!</div>
+            <h3 class="text-xl font-extrabold text-rameev-dark">Зачем GitHub художникам, сценаристам и&nbsp;QA?</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div class="p-3.5 rounded-xl bg-purple-50 border border-purple-200">
+                <div class="font-bold text-purple-900 mb-1"><i class="fa-solid fa-palette mr-1.5"></i> Арт и UI (Настя, Данир, Ульяна, Рамзиль)</div>
+                <p class="text-xs text-purple-800">Заменяете <code class="font-mono">android.png</code> в&nbsp;папке <code class="font-mono">/assets</code> — и&nbsp;спрайт сам обновляется в&nbsp;игре! Плюс ползунок «Было / Стало» прямо в&nbsp;браузере.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200">
+                <div class="font-bold text-amber-900 mb-1"><i class="fa-solid fa-scroll mr-1.5"></i> Геймдизайн (Рамзиль, Саша К., Руслан)</div>
+                <p class="text-xs text-amber-800">Редактируете диалоги NPC и&nbsp;квесты прямо на&nbsp;сайте GitHub (кнопка с&nbsp;карандашом) без установки сложных программ.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                <div class="font-bold text-emerald-900 mb-1"><i class="fa-solid fa-bug-slash mr-1.5"></i> Звук и QA (Надежда, Григорий, Алина)</div>
+                <p class="text-xs text-emerald-800">Вкладка <b>Issues</b> — ваша доска охоты на&nbsp;баги и&nbsp;загрузки звуковых паков <code class="font-mono">.wav</code> / <code class="font-mono">.ogg</code> для локаций.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-blue-50 border border-blue-200">
+                <div class="font-bold text-blue-900 mb-1"><i class="fa-solid fa-laptop-code mr-1.5"></i> Разработка (Саша Г., Илья, Данила, Ульяна, Алина)</div>
+                <p class="text-xs text-blue-800">Зелёные квадратики активности в&nbsp;профиле GitHub — главное портфолио при устройстве на&nbsp;стажировку в&nbsp;IT.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Живой демо-виджет для художников: сравнение спрайта Было / Стало ползунком -->
+          <div class="lg:col-span-5 bg-rameev-dark text-white p-5 rounded-2xl border border-white/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono text-rameev-lime"><i class="fa-solid fa-sliders mr-1"></i> Фишка GitHub для художников: Image Diff</span>
+              <span class="text-[11px] font-mono text-gray-400">hero_android.png</span>
+            </div>
+            <div class="relative h-36 rounded-xl overflow-hidden bg-[#161B26] border border-white/15 select-none">
+              <!-- Версия 2 (Стало — прокачанный кибер-андроид) -->
+              <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-950 to-emerald-950">
+                <div class="text-center">
+                  <div class="text-4xl mb-1">🤖✨🛡️</div>
+                  <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/30 text-emerald-300 border border-emerald-400/40">v2.0 Финальный пиксель-арт + Щит</span>
+                </div>
+              </div>
+              <!-- Версия 1 (Было — серый черновик), ширина управляется ползунком -->
+              <div id="sprite-diff-overlay" class="absolute inset-y-0 left-0 overflow-hidden bg-neutral-800 border-r-2 border-rameev-lime" style="width: 50%;">
+                <div class="w-96 h-full flex items-center justify-center">
+                  <div class="text-center">
+                    <div class="text-4xl mb-1 opacity-60 grayscale">📦🤖</div>
+                    <span class="text-xs font-mono px-2 py-0.5 rounded bg-white/10 text-gray-300">v1.0 Серый набросок (Скетч)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[11px] font-mono text-gray-400">Было (v1)</span>
+              <input type="range" min="5" max="95" value="50" oninput="document.getElementById('sprite-diff-overlay').style.width = this.value + '%'" class="w-full accent-rameev-lime cursor-pointer">
+              <span class="text-[11px] font-mono text-rameev-lime">Стало (v2)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ЧАСТЬ 4: ЖИВОЙ ТРЕНАЖЁР ВЕТОК + ДОМАШНЕЕ ЗАДАНИЕ LEARN GIT BRANCHING   -->
+    <!-- ===================================================================== -->
+    <section id="sec-sandbox" class="scroll-mt-20 space-y-8">
+      <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-200">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Левая часть: Интерактивная песочница дерева коммитов (7 колонок) -->
+          <div class="lg:col-span-7 bg-[#161B26] text-white rounded-2xl p-5 border border-white/15 shadow-xl space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-white/10">
+              <div>
+                <span class="text-[11px] font-mono uppercase tracking-wider text-rameev-lime block">Мини-тренажёр прямо на странице</span>
+                <h3 class="text-lg font-bold">Попробуй команды перед домашкой!</h3>
+              </div>
+              <div id="sandbox-quest-badge" class="text-xs font-mono px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                🎯 Мини-квест: создай ветку feature, сделай коммит и слей в main
+              </div>
+            </div>
+
+            <!-- Кнопки управления Git-командами -->
+            <div class="flex flex-wrap gap-2">
+              <button onclick="sandboxAction('commit')" class="px-3 py-2 rounded-xl bg-rameev-blue hover:bg-rameev-ink text-white font-mono text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-plus-circle"></i> git commit
+              </button>
+              <button onclick="sandboxAction('branch')" class="px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-code-branch"></i> git branch feature
+              </button>
+              <button onclick="sandboxAction('checkout')" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-rameev-dark font-mono text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-arrows-Left-right"></i> git checkout <span id="checkout-target-label">feature</span>
+              </button>
+              <button onclick="sandboxAction('merge')" class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-rameev-dark font-mono text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-code-merge"></i> git merge feature
+              </button>
+              <button onclick="sandboxAction('reset')" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-gray-300 font-mono text-xs transition ml-auto">
+                <i class="fa-solid fa-rotate-left"></i> Сброс
+              </button>
+            </div>
+
+            <!-- SVG-холст живого графа веток -->
+            <div class="bg-[#0F131C] rounded-xl border border-white/10 p-3 h-56 relative overflow-x-auto flex items-center">
+              <svg id="sandbox-svg" width="100%" height="190" viewBox="0 0 650 190" class="min-w-[560px]"></svg>
+            </div>
+
+            <!-- Строка лога терминала -->
+            <div class="bg-black/50 rounded-xl px-4 py-2.5 font-mono text-xs flex items-center justify-between border border-white/5">
+              <div class="truncate">
+                <span class="text-emerald-400">studio@kernel-valley:~$</span>
+                <span id="sandbox-terminal-text" class="text-gray-200 ml-2">Готов к работе. Текущая ветка: main</span>
+              </div>
+              <span id="sandbox-head-indicator" class="text-[11px] px-2 py-0.5 rounded bg-rameev-blue/30 text-rameev-lime shrink-0">HEAD -> main</span>
+            </div>
+          </div>
+
+          <!-- Правая часть: Домашнее задание на неделю (5 колонок) -->
+          <div class="lg:col-span-5 space-y-5">
+            <div>
+              <div class="text-xs font-bold uppercase tracking-wider text-rameev-ink mb-1">40:00–45:00 · Задание на неделю</div>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-rameev-dark">Домашний квест: Learn Git Branching</h2>
+              <p class="text-sm text-gray-600 mt-1">
+                Проходим визуальную браузерную игру-головоломку и&nbsp;скидываем скриншот с&nbsp;зелёными галочками в&nbsp;Telegram-чат студии!
+              </p>
+            </div>
+
+            <!-- Нормативы по отделам -->
+            <div class="space-y-3">
+              <div class="p-4 rounded-2xl bg-rameev-soft/70 border border-rameev-blue/30">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold uppercase tracking-wider text-rameev-ink">🌟 Базовый минимум (Все отделы)</span>
+                  <span class="text-xs font-mono font-bold bg-white px-2 py-0.5 rounded text-rameev-ink">~15 минут</span>
+                </div>
+                <p class="text-sm font-semibold text-rameev-dark">Вкладка «Основная» → Блок «Введение» (Уровни 1–4)</p>
+                <p class="text-xs text-gray-600 mt-1">Знакомство с&nbsp;коммитами, ветвлением, <code class="font-mono">merge</code> и&nbsp;<code class="font-mono">rebase</code>. Обязательно для Арта, Геймдизайна, Звука/QA и&nbsp;Разработки.</p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-rameev-dark text-white border border-white/10">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold uppercase tracking-wider text-rameev-lime">🚀 Профи-уровень (Отдел разработки)</span>
+                  <span class="text-xs font-mono font-bold bg-white/10 px-2 py-0.5 rounded text-rameev-lime">+ Аккаунт GitHub</span>
+                </div>
+                <p class="text-sm font-semibold text-white">Блок «Едем дальше» + вкладка «Удалённые репозитории»</p>
+                <p class="text-xs text-gray-300 mt-1">Освоить <code class="font-mono text-rameev-lime">git push</code>, <code class="font-mono text-rameev-lime">git pull</code> и&nbsp;<code class="font-mono text-rameev-lime">origin/main</code>, плюс зарегистрироваться на&nbsp;GitHub и&nbsp;скинуть ссылку на&nbsp;свой профиль в&nbsp;чат.</p>
+              </div>
+            </div>
+
+            <!-- Кнопки перехода на тренажёр и копирования анонса в Telegram -->
+            <div class="flex flex-col sm:flex-row gap-3 pt-1">
+              <a href="https://learngitbranching.js.org/?locale=ru_RU" target="_blank" rel="noopener noreferrer" class="flex-1 px-4 py-3 rounded-xl bg-rameev-ink hover:bg-rameev-dark text-white font-bold text-sm text-center transition flex items-center justify-center gap-2 shadow-md">
+                <i class="fa-solid fa-up-right-from-square"></i> Открыть LearnGitBranching
+              </a>
+              <button onclick="copyHomeworkToClipboard()" class="px-4 py-3 rounded-xl bg-rameev-surface hover:bg-gray-200 text-rameev-dark font-bold text-sm transition flex items-center justify-center gap-2 border border-gray-300">
+                <i class="fa-regular fa-copy"></i> Скопировать пост для чата
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ФУТЕР -->
+  <footer class="bg-rameev-dark text-gray-400 text-xs py-6 border-t border-white/10 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-rameev-lime"></span>
+        <span class="font-semibold text-white">Цифровой колледж им. Башира Рамеева</span>
+        <span>· Кружок «Проектная деятельность: Инди-студия»</span>
+      </div>
+      <div class="font-mono text-gray-400">
+        Подсказка ведущему: клавиши <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white">1</kbd>–<kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white">4</kbd> быстро прокручивают экран к нужному мультику
+      </div>
+    </div>
+  </footer>
+
+  <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ (ВМЕСТО ALERT) -->
+  <div id="toast-notification" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 pointer-events-none transition-all duration-300 bg-rameev-dark text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-rameev-lime/40 flex items-center gap-3 max-w-md">
+    <div class="w-8 h-8 rounded-xl bg-rameev-lime text-rameev-dark flex items-center justify-center font-bold shrink-0">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <div id="toast-text" class="text-xs sm:text-sm font-medium leading-snug">Уведомление</div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- JAVASCRIPT: ЛОГИКА ТАЙМЕРА, СПИСКОВ КОМАНДЫ, 4 ПЛЕЕРОВ МУЛЬТИКОВ И ГРАФА -->
+  <!-- ======================================================================= -->
+  <script>
+    // --- УТИЛИТА ВСПЛЫВАЮЩИХ СООБЩЕНИЙ (БЕЗ ALERT) ---
+    let toastTimeout = null;
+    function showToast(message) {
+      const toast = document.getElementById('toast-notification');
+      const text = document.getElementById('toast-text');
+      text.textContent = message;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3600);
+    }
+
+    // --- 1. СПИСОК ВСЕХ 12 СТУДЕНТОВ ПО ОТДЕЛАМ И ТАЙМЕР ПИТЧИНГА ---
+    const departmentsData = [
+      {
+        id: 'dev',
+        name: '1. Отдел разработки (Dev & AI)',
+        color: 'blue',
+        badgeBg: 'bg-blue-100 text-blue-900',
+        icon: 'fa-code',
+        focus: 'Код локации, экономика кукурузы, DDoS-монстры',
+        members: [
+          { id: 's1', name: 'Головин Александр', group: '26-01', role: '2D-мир и карта деревни', pitched: false },
+          { id: 's2', name: 'Сырцев Илья', group: '26-11', role: 'Экономика и урожай кукурузы', pitched: false },
+          { id: 's3', name: 'Анисимов Данила', group: '26-01', role: 'Боевая система и баги', pitched: false },
+          { id: 's4', name: 'Громова Ульяна', group: '26-01', role: 'Разработка + Арт (совм.)', pitched: false },
+          { id: 's5', name: 'Янгучина Алина', group: '26-01', role: 'Разработка + Звук (идеи)', pitched: false }
+        ]
+      },
+      {
+        id: 'gd',
+        name: '2. Геймдизайн и нарратив (GD)',
+        color: 'amber',
+        badgeBg: 'bg-amber-100 text-amber-900',
+        icon: 'fa-scroll',
+        focus: 'Лор кибер-деревни, квесты, диалоги NPC',
+        members: [
+          { id: 's6', name: 'Губеев Рамзиль', group: '26-02', role: 'Геймдизайн + Арт (совм.)', pitched: false },
+          { id: 's7', name: 'Куклин Александр', group: '26-02', role: 'Сюжет, квесты и диалоги NPC', pitched: false },
+          { id: 's8', name: 'Бариев Руслан', group: '26-01', role: 'Механики фермы и помощников', pitched: false }
+        ]
+      },
+      {
+        id: 'art',
+        name: '3. Арт, UI и визуал (Art)',
+        color: 'purple',
+        badgeBg: 'bg-purple-100 text-purple-900',
+        icon: 'fa-palette',
+        focus: 'Пиксель-арт сверху, ИБ-андроид, Liquid Glass UI',
+        members: [
+          { id: 's9', name: 'Концова Анастасия', group: '26-02', role: 'Спрайты героев и тайлы деревни', pitched: false },
+          { id: 's10', name: 'Сагиров Данир', group: '26-01', role: 'Пиксель-арт монстров и UI', pitched: false },
+          { id: 's4_art', name: 'Громова Ульяна (совм.)', group: '26-01', role: 'Скетчи и визуал помощника', pitched: false, linkedId: 's4' },
+          { id: 's6_art', name: 'Губеев Рамзиль (совм.)', group: '26-02', role: 'Концепт-арт и интерфейс', pitched: false, linkedId: 's6' }
+        ]
+      },
+      {
+        id: 'qa',
+        name: '4. Звук, медиа и QA',
+        color: 'emerald',
+        badgeBg: 'bg-emerald-100 text-emerald-900',
+        icon: 'fa-headphones-simple',
+        focus: '8-битный саундтрек, SFX и чек-лист проверки багов',
+        members: [
+          { id: 's11', name: 'Мосунова Надежда', group: '26-01', role: 'Звуковой пак и MVP с лавкой', pitched: false },
+          { id: 's12', name: 'Архиреев Григорий', group: '26-11', role: 'QA чек-лист и автоматизация', pitched: false },
+          { id: 's5_qa', name: 'Янгучина Алина (муз.)', group: '26-01', role: 'Музыкальные референсы', pitched: false, linkedId: 's5' }
+        ]
+      }
+    ];
+
+    const pitchedSet = new Set();
+
+    function renderDepartments() {
+      const grid = document.getElementById('departments-grid');
+      grid.innerHTML = departmentsData.map(dept => `
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="w-9 h-9 rounded-xl ${dept.badgeBg} flex items-center justify-center font-bold">
+                <i class="fa-solid ${dept.icon}"></i>
+              </span>
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600">${dept.members.length} уч.</span>
+            </div>
+            <h3 class="font-extrabold text-base text-rameev-dark">${dept.name}</h3>
+            <p class="text-xs text-gray-500 mt-0.5 mb-4">${dept.focus}</p>
+
+            <div class="space-y-2">
+              ${dept.members.map(m => {
+                const realId = m.linkedId || m.id;
+                const isDone = pitchedSet.has(realId);
+                return `
+                  <div onclick="selectStudentPitch('${realId}', '${m.name.replace(/'/g, '')}')"
+                       class="cursor-pointer p-2.5 rounded-xl border transition flex items-center justify-between gap-2 ${isDone ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : 'bg-rameev-surface hover:bg-rameev-soft/50 border-gray-200/80'}">
+                    <div class="min-w-0">
+                      <div class="text-xs font-bold truncate flex items-center gap-1.5">
+                        <span>${m.name}</span>
+                        <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/5 text-gray-600">${m.group}</span>
+                      </div>
+                      <div class="text-[11px] text-gray-500 truncate">${m.role}</div>
+                    </div>
+                    <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${isDone ? 'bg-emerald-500 text-white' : 'bg-white border border-gray-300 text-gray-400'}">
+                      <i class="fa-solid ${isDone ? 'fa-check text-xs' : 'fa-play text-[10px]'}"></i>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('pitched-count').textContent = pitchedSet.size;
+    }
+
+    // Таймер питча на 2 минуты
+    let pitchSeconds = 120;
+    let pitchInterval = null;
+
+    function updatePitchTimerUI() {
+      const mins = String(Math.floor(pitchSeconds / 60)).padStart(2, '0');
+      const secs = String(pitchSeconds % 60).padStart(2, '0');
+      const disp = document.getElementById('pitch-timer-display');
+      disp.textContent = `${mins}:${secs}`;
+      if (pitchSeconds <= 20) {
+        disp.className = 'font-mono text-base font-bold text-red-400 animate-pulse leading-none';
+      } else {
+        disp.className = 'font-mono text-base font-bold text-rameev-lime leading-none';
+      }
+    }
+
+    function togglePitchTimer() {
+      const icon = document.getElementById('pitch-timer-icon');
+      if (pitchInterval) {
+        clearInterval(pitchInterval);
+        pitchInterval = null;
+        icon.className = 'fa-solid fa-play';
+      } else {
+        if (pitchSeconds <= 0) pitchSeconds = 120;
+        icon.className = 'fa-solid fa-pause';
+        pitchInterval = setInterval(() => {
+          pitchSeconds--;
+          updatePitchTimerUI();
+          if (pitchSeconds <= 0) {
+            clearInterval(pitchInterval);
+            pitchInterval = null;
+            icon.className = 'fa-solid fa-play';
+            showToast('⏰ 2 минуты вышли! Переходим к следующему MVP и вопросам.');
+          }
+        }, 1000);
+      }
+    }
+
+    function resetPitchTimer() {
+      clearInterval(pitchInterval);
+      pitchInterval = null;
+      pitchSeconds = 120;
+      document.getElementById('pitch-timer-icon').className = 'fa-solid fa-play';
+      updatePitchTimerUI();
+    }
+
+    function selectStudentPitch(studentId, studentName) {
+      if (pitchedSet.has(studentId)) {
+        pitchedSet.delete(studentId);
+      } else {
+        pitchedSet.add(studentId);
+        document.getElementById('pitch-speaker-label').textContent = 'Питч: ' + studentName;
+        resetPitchTimer();
+        togglePitchTimer();
+        showToast(`🎤 Выступает ${studentName} — таймер на 02:00 запущен!`);
+      }
+      renderDepartments();
+    }
+
+    function markAllPitched() {
+      if (pitchedSet.size === 12) {
+        pitchedSet.clear();
+      } else {
+        ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12'].forEach(id => pitchedSet.add(id));
+        showToast('🎉 Все 12 участников показали свои MVP! Переходим к мультикам про Git.');
+      }
+      renderDepartments();
+    }
+
+    // =========================================================================
+    // 2. ДВИЖОК 4 ИНТЕРАКТИВНЫХ МУЛЬТИКОВ С ПУЛЬТАМИ УПРАВЛЕНИЯ
+    // =========================================================================
+
+    const cartoonsConfig = [
+      // -----------------------------------------------------------------------
+      // МУЛЬТИК №1: КРАШ-ТЕСТ В ЧАТЕ VS ПОРЯДОК В GIT (5 ШАГОВ)
+      // -----------------------------------------------------------------------
+      {
+        id: 1,
+        badge: 'Мультик №1 · Мостик от презентации MVP к Git',
+        title: 'Краш-тест сборки в чате vs. Порядок в GitHub',
+        subtitle: 'Что произойдёт, если мы попытаемся склеить 12 наших прототипов «Kernel Valley» через обычный мессенджер',
+        steps: [
+          {
+            label: 'Шаг 1. 12 работ готовы',
+            narration: 'У каждого из 12 ребят готов свой кусок «Kernel Valley»: у Ильи — экономика кукурузы, у Саши Г. — карта, у Данира и Насти — пиксельные спрайты, у Саши К. — диалоги. Пора собрать их в одну игру!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-gradient-to-br from-[#161B26] to-[#1E2638] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-gray-400 border-b border-white/10 pb-2">
+                  <span>📍 Ситуация после питчинга MVP</span>
+                  <span class="text-rameev-lime">12 локальных папок на разных ПК</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-auto py-4">
+                  <div class="bg-white/5 border border-blue-400/30 rounded-xl p-3 text-center anim-float">
+                    <div class="text-2xl mb-1">💻</div>
+                    <div class="text-xs font-bold text-blue-300">Илья &amp; Саша Г.</div>
+                    <div class="text-[11px] font-mono text-gray-400 mt-1">economy.js, map.js</div>
+                  </div>
+                  <div class="bg-white/5 border border-purple-400/30 rounded-xl p-3 text-center anim-float" style="animation-delay:0.4s">
+                    <div class="text-2xl mb-1">🎨</div>
+                    <div class="text-xs font-bold text-purple-300">Данир &amp; Настя</div>
+                    <div class="text-[11px] font-mono text-gray-400 mt-1">android_hero.png</div>
+                  </div>
+                  <div class="bg-white/5 border border-amber-400/30 rounded-xl p-3 text-center anim-float" style="animation-delay:0.8s">
+                    <div class="text-2xl mb-1">📜</div>
+                    <div class="text-xs font-bold text-amber-300">Саша К. &amp; Рамзиль</div>
+                    <div class="text-[11px] font-mono text-gray-400 mt-1">village_npc.json</div>
+                  </div>
+                  <div class="bg-white/5 border border-emerald-400/30 rounded-xl p-3 text-center anim-float" style="animation-delay:1.2s">
+                    <div class="text-2xl mb-1">🔊</div>
+                    <div class="text-xs font-bold text-emerald-300">Надежда &amp; Григорий</div>
+                    <div class="text-[11px] font-mono text-gray-400 mt-1">8bit_corn.wav</div>
+                  </div>
+                </div>
+                <div class="bg-white/10 rounded-xl p-3 text-center text-xs sm:text-sm font-semibold text-rameev-lime">
+                  🤔 Вопрос студии: «Давайте просто скинем всё в Telegram-чат и скопируем в одну папку?»
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 2. Лавина архивов в чате',
+            narration: 'Все одновременно кидают файлы в общий чат: «игра_финал.zip», «игра_финал_точно_v2_Илья.zip», «спрайты_исправленные_Данир.png». За 2 минуты в чате образуется свалка из 20 архивов.',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#121824] text-white relative overflow-hidden">
+                <div class="flex items-center justify-between text-xs font-mono text-amber-300 border-b border-white/10 pb-2">
+                  <span>💬 Чат студии: «Скидываем файлы сюда!»</span>
+                  <span class="px-2 py-0.5 rounded bg-amber-500/20">Новых файлов: 18 шт.</span>
+                </div>
+                <div class="space-y-2 my-auto max-w-xl mx-auto w-full font-mono text-xs">
+                  <div class="bg-blue-950/80 border border-blue-400/40 rounded-xl p-2.5 flex items-center justify-between transform -rotate-1">
+                    <span>📦 <b>Саша Головин:</b> game_final.zip</span>
+                    <span class="text-[10px] text-blue-300">16:41</span>
+                  </div>
+                  <div class="bg-indigo-950/80 border border-indigo-400/40 rounded-xl p-2.5 flex items-center justify-between transform rotate-1 ml-6">
+                    <span>📦 <b>Илья Сырцев:</b> game_final_v2_исправленная_кукуруза.zip</span>
+                    <span class="text-[10px] text-indigo-300">16:41</span>
+                  </div>
+                  <div class="bg-purple-950/80 border border-purple-400/40 rounded-xl p-2.5 flex items-center justify-between transform -rotate-1">
+                    <span>🖼️ <b>Данир Сагиров:</b> спрайты_точно_финал_3.png</span>
+                    <span class="text-[10px] text-purple-300">16:42</span>
+                  </div>
+                  <div class="bg-amber-950/80 border border-amber-400/40 rounded-xl p-2.5 flex items-center justify-between transform rotate-1 ml-4">
+                    <span>📄 <b>Саша Куклин:</b> диалоги_деревня_не_трогать.txt</span>
+                    <span class="text-[10px] text-amber-300">16:42</span>
+                  </div>
+                </div>
+                <div class="text-center text-xs font-mono text-amber-300">
+                  ⚠️ Какой из пяти «game_final.zip» на самом деле самый свежий?!
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 3. Ручная склейка в блокноте',
+            narration: 'Пытаемся вручную скопировать код Ильи в файл Саши. При сохранении поверх случайно затирается функция посадки кукурузы, а имя картинки Данира не совпадает с кодом!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-red-300 border-b border-white/10 pb-2">
+                  <span>📝 Ручное копирование кусков кода (Copy-Paste)</span>
+                  <span class="px-2 py-0.5 rounded bg-red-500/20">Перезапись чужих файлов!</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-auto font-mono text-xs">
+                  <div class="bg-black/60 border border-red-500/50 rounded-xl p-3.5 space-y-1.5">
+                    <div class="text-gray-400 text-[11px]">Окно Windows: Замена файла</div>
+                    <div class="text-red-400 font-bold">Заменить файл "main.js"?</div>
+                    <p class="text-gray-300 text-[11px] font-sans">Поверх кода экономики Ильи записывается старый файл без кукурузы...</p>
+                    <div class="pt-1 flex gap-2">
+                      <span class="px-2 py-1 rounded bg-red-600 text-white text-[10px]">Да, перезаписать (Упс!)</span>
+                    </div>
+                  </div>
+                  <div class="bg-black/60 border border-amber-500/50 rounded-xl p-3.5 space-y-1.5">
+                    <div class="text-gray-400 text-[11px]">Консоль ошибок игры:</div>
+                    <div class="text-amber-300">❌ 404 Not Found: "hero_android.png"</div>
+                    <div class="text-gray-400 text-[11px]">В папке лежит: "спрайт_данир_финал.png"</div>
+                    <div class="text-red-400">❌ Uncaught ReferenceError: plantCorn is not defined</div>
+                  </div>
+                </div>
+                <div class="text-center text-xs text-red-300 font-semibold">
+                  😱 «Кто стёр мой код экономики?! Он же минуту назад работал!»
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 4. Взрыв билда!',
+            narration: 'БАБАХ! Игра «Kernel Valley» вообще перестаёт запускаться: вместо ИБ-андроида и поля кукурузы — чёрный экран, битые текстуры и 42 синтаксические ошибки.',
+            render: () => `
+              <div class="h-full w-full flex flex-col items-center justify-center p-6 bg-red-950/90 text-white text-center relative overflow-hidden">
+                <div class="anim-shake bg-black/80 border-2 border-red-500 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-3">
+                  <div class="text-4xl">💥🤖🌽💥</div>
+                  <div class="font-mono text-sm sm:text-base font-extrabold text-red-400 uppercase tracking-wider">
+                    FATAL BUILD ERROR: EVERYTHING IS BROKEN
+                  </div>
+                  <p class="text-xs sm:text-sm text-gray-300">
+                    Потеряно 140 строк кода экономики, сломаны диалоги NPC, а вернуть рабочую версию невозможно — никто не помнит, на каком шаге всё упало.
+                  </p>
+                  <div class="font-mono text-[11px] bg-red-500/20 text-red-200 py-1.5 px-3 rounded-lg">
+                    Статус студии без Git: 0 рабочих билдов к дедлайну
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 5. Спасение: Единый GitHub',
+            narration: 'А теперь включаем Git и GitHub! Вместо архивов в чате — единый облачный репозиторий studio/kernel-valley, где каждый шаг сохранён как сейв-слот и ни одна строчка не теряется.',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-gradient-to-br from-[#12221E] via-[#161B26] to-[#1A2942] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-emerald-300 border-b border-white/10 pb-2">
+                  <span>✅ Решение: Репозиторий GitHub «studio/kernel-valley»</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40">0 потерянных строк</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-auto items-center">
+                  <div class="space-y-2 text-xs">
+                    <div class="bg-white/10 rounded-xl p-2.5 border-l-4 border-rameev-blue">
+                      <b>Dev-отдел:</b> пушит код в свои ветки
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-2.5 border-l-4 border-purple-400">
+                      <b>Арт-отдел:</b> обновляет спрайты в <code class="font-mono">/assets</code>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-2.5 border-l-4 border-amber-400">
+                      <b>GD &amp; QA:</b> правят диалоги и проверяют билд
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-center justify-center p-4 bg-rameev-blue/20 rounded-2xl border-2 border-rameev-lime shadow-lg text-center">
+                    <i class="fa-brands fa-github text-4xl text-rameev-lime mb-2"></i>
+                    <div class="font-mono text-xs font-bold text-white">kernel-valley/main</div>
+                    <div class="text-[11px] text-emerald-300 mt-1">Авто-сборка + История сейвов</div>
+                  </div>
+                  <div class="pixel-grid-bg rounded-2xl p-3 border border-emerald-400/40 text-center space-y-1">
+                    <div class="text-3xl anim-patrol inline-block">🤖</div>
+                    <div class="text-xl">🌽 🌽 🌽 🏭</div>
+                    <div class="text-[11px] font-mono text-emerald-300 font-bold">Игра стабильно работает!</div>
+                  </div>
+                </div>
+                <div class="text-center text-xs font-mono text-rameev-lime">
+                  🎯 Git — это наш общий сборочный цех и машина времени!
+                </div>
+              </div>
+            `
+          }
+        ]
+      },
+
+      // -----------------------------------------------------------------------
+      // МУЛЬТИК №2 (ТРЮК 1): GITHUB PAGES — ХОСТИНГ ЗА 30 СЕКУНД (4 ШАГА)
+      // -----------------------------------------------------------------------
+      {
+        id: 2,
+        badge: 'Мультик №2 · Трюк 1: GitHub Pages',
+        title: 'Бесплатный хостинг игры за 30 секунд',
+        subtitle: 'Как превратить файлы на ноутбуке разработчика в публичную веб-ссылку, которая открывается с любого телефона',
+        steps: [
+          {
+            label: 'Шаг 1. «А у меня только на моём ПК!»',
+            narration: 'Разработчик запустил игру у себя на компьютере (C:/Users/Dev/index.html), а остальные 11 участников студии сидят перед пустыми экранами: архив долго качать, а на телефоне он вообще не открывается.',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-gray-400 border-b border-white/10 pb-2">
+                  <span>🖥️ Локальный запуск vs Команда</span>
+                  <span class="text-amber-300">Доступно только 1 из 12 человек</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 my-auto items-center">
+                  <div class="sm:col-span-5 bg-emerald-950/40 border border-emerald-400/40 rounded-2xl p-4">
+                    <div class="text-[11px] font-mono text-emerald-300 mb-2">💻 Ноутбук разработчика:</div>
+                    <div class="bg-black/60 px-2.5 py-1 rounded text-[11px] font-mono text-gray-300 mb-3 truncate">
+                      file:///C:/Users/Ilya/kernel_valley/index.html
+                    </div>
+                    <div class="pixel-grid-bg h-24 rounded-xl flex items-center justify-center gap-3 border border-white/10">
+                      <span class="text-3xl anim-patrol">🤖</span>
+                      <span class="text-2xl">🌽🌽</span>
+                    </div>
+                  </div>
+                  <div class="sm:col-span-2 text-center text-2xl text-red-400 font-bold">
+                    ⛔ Нет связи
+                  </div>
+                  <div class="sm:col-span-5 bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2">
+                    <div class="text-xs font-bold text-gray-300">📱 Смартфоны и ПК остальных 11 ребят:</div>
+                    <div class="p-2.5 rounded-xl bg-black/40 text-xs text-gray-400 font-mono">
+                      ❌ Настя (Арт): «На телефоне .zip не запускается...»
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-black/40 text-xs text-gray-400 font-mono">
+                      ❌ Григорий (QA): «Скинь новую версию, старая не та!»
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center text-xs text-gray-300">
+                  Как дать всей команде живую ссылку на игру без покупки платного хостинга?
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 2. Пушим код в облако GitHub',
+            narration: 'Отправляем файлы проекта в наш репозиторий одной командой git push. Код, пиксельные спрайты ИБ-андроида и кукурузы улетают на сервер GitHub.',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-rameev-blue border-b border-white/10 pb-2">
+                  <span>🚀 Отправка файлов в облако (git push origin main)</span>
+                  <span class="text-rameev-lime">Загрузка 100%</span>
+                </div>
+                <div class="my-auto flex flex-col sm:flex-row items-center justify-around gap-6 py-4">
+                  <div class="bg-black/70 border border-white/15 rounded-2xl p-4 font-mono text-xs w-64">
+                    <div class="text-emerald-400">$ git add .</div>
+                    <div class="text-emerald-400">$ git commit -m "MVP v1"</div>
+                    <div class="text-rameev-lime font-bold">$ git push origin main</div>
+                    <div class="text-gray-400 text-[11px] mt-2">Uploading objects: 100% (14/14)...</div>
+                  </div>
+
+                  <!-- Анимированный поток пакетов -->
+                  <div class="flex items-center gap-3">
+                    <div class="px-3 py-2 rounded-xl bg-rameev-blue/20 border border-rameev-blue text-xs font-mono anim-float">
+                      📄 index.html
+                    </div>
+                    <i class="fa-solid fa-angles-right text-rameev-lime text-xl animate-pulse"></i>
+                    <div class="px-3 py-2 rounded-xl bg-purple-500/20 border border-purple-400 text-xs font-mono anim-float" style="animation-delay:0.3s">
+                      🖼️ android.png
+                    </div>
+                    <i class="fa-solid fa-angles-right text-rameev-lime text-xl animate-pulse"></i>
+                  </div>
+
+                  <div class="bg-rameev-ink/40 border-2 border-rameev-blue rounded-2xl p-5 text-center w-48">
+                    <i class="fa-brands fa-github text-4xl text-white mb-2"></i>
+                    <div class="text-xs font-bold">GitHub Cloud</div>
+                    <div class="text-[11px] font-mono text-rameev-lime">studio/kernel-valley</div>
+                  </div>
+                </div>
+                <div class="text-center text-xs font-mono text-gray-300">
+                  Файлы уже в репозитории. Осталось щёлкнуть один тумблер!
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 3. Включаем тумблер GitHub Pages',
+            narration: 'Заходим в Settings -> Pages репозитория, выбираем ветку main и нажимаем Save. GitHub сам бесплатно поднимает веб-сервер и собирает сайт игры за 20 секунд!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-rameev-lime border-b border-white/10 pb-2">
+                  <span>⚙️ Настройки репозитория: Settings → Pages</span>
+                  <span>Автоматическая сборка сайта</span>
+                </div>
+                <div class="my-auto max-w-lg mx-auto w-full bg-[#0F131C] border border-white/15 rounded-2xl p-5 space-y-4 shadow-2xl">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-sm font-bold text-white">Build and deployment</div>
+                      <div class="text-xs text-gray-400">Deploy from a branch</div>
+                    </div>
+                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs border border-emerald-400/40">
+                      <i class="fa-solid fa-toggle-on mr-1"></i> Active
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-3 bg-white/5 p-3 rounded-xl font-mono text-xs">
+                    <span class="px-2.5 py-1 rounded bg-rameev-blue text-white font-bold"><i class="fa-solid fa-code-branch mr-1"></i> Branch: main</span>
+                    <span class="px-2.5 py-1 rounded bg-white/10 text-gray-300">/(root)</span>
+                    <span class="ml-auto px-3 py-1 rounded bg-emerald-500 text-rameev-dark font-bold">Saved ✓</span>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs font-mono text-rameev-lime">
+                    <i class="fa-solid fa-gear fa-spin text-base"></i>
+                    <span>Deploying to github-pages environment... Готово за 18 сек!</span>
+                  </div>
+                </div>
+                <div class="text-center text-xs text-gray-300">
+                  Никаких сложных настроек серверов — GitHub делает всё сам.
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 4. Вся студия играет со смартфонов!',
+            narration: 'Готово! Появляется публичная ссылка studio.github.io/kernel-valley. Скидываем её в чат — и каждый участник открывает живую игру прямо с телефона или ноутбука!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-gradient-to-br from-[#122620] to-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-emerald-300 border-b border-white/10 pb-2">
+                  <span>🌐 Игра опубликована в интернете!</span>
+                  <span class="px-2.5 py-0.5 rounded bg-rameev-lime text-rameev-dark font-bold">https://studio.github.io/kernel-valley</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-auto py-2">
+                  <div class="bg-black/60 border-2 border-emerald-400/60 rounded-2xl p-3 text-center">
+                    <div class="text-[11px] font-mono text-gray-300 mb-1">📱 Смартфон Насти (Арт)</div>
+                    <div class="pixel-grid-bg h-24 rounded-xl flex items-center justify-center gap-2">
+                      <span class="text-2xl anim-patrol">🤖</span><span class="text-xl">🌽</span>
+                    </div>
+                    <div class="text-[11px] text-emerald-300 mt-1">«Ого, мой спрайт в игре!»</div>
+                  </div>
+                  <div class="bg-black/60 border-2 border-rameev-blue rounded-2xl p-3 text-center">
+                    <div class="text-[11px] font-mono text-gray-300 mb-1">💻 ПК Саши К. (Геймдизайн)</div>
+                    <div class="pixel-grid-bg h-24 rounded-xl flex items-center justify-center gap-2">
+                      <span class="text-2xl anim-patrol">🤖</span><span class="text-xl">💬🌽</span>
+                    </div>
+                    <div class="text-[11px] text-rameev-lime mt-1">«Диалоги открываются по ссылке!»</div>
+                  </div>
+                  <div class="bg-black/60 border-2 border-amber-400/60 rounded-2xl p-3 text-center">
+                    <div class="text-[11px] font-mono text-gray-300 mb-1">📱 Планшет Надежды (QA)</div>
+                    <div class="pixel-grid-bg h-24 rounded-xl flex items-center justify-center gap-2">
+                      <span class="text-2xl anim-patrol">🤖</span><span class="text-xl">🔊🌽</span>
+                    </div>
+                    <div class="text-[11px] text-amber-300 mt-1">«Тестирую прямо с телефона!»</div>
+                  </div>
+                </div>
+                <div class="text-center text-xs font-mono text-rameev-lime">
+                  ✨ Любое обновление в репозитории автоматически обновляет игру по этой ссылке!
+                </div>
+              </div>
+            `
+          }
+        ]
+      },
+
+      // -----------------------------------------------------------------------
+      // МУЛЬТИК №3 (ТРЮК 2): DIFF & REVERT — СПАСЕНИЕ ЗА 5 СЕКУНД (5 ШАГОВ)
+      // -----------------------------------------------------------------------
+      {
+        id: 3,
+        badge: 'Мультик №3 · Трюк 2: Git Diff & Revert',
+        title: '«Я всё сломал!» — Спасаем проект за 5 секунд',
+        subtitle: 'Как рентген изменений (Diff) и кнопка отката (Revert) мгновенно лечат критические баги в игре',
+        steps: [
+          {
+            label: 'Шаг 1. Стабильный сейв #104',
+            narration: 'Смотрим на рабочую игру в коммите #104: скорость DDoS-монстра равна 5, функция отрисовки ИБ-андроида на месте, кукуруза в безопасности, FPS 60.',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-emerald-300 border-b border-white/10 pb-2">
+                  <span>💾 Commit #104 (Точка сохранения: «Стабильный билд»)</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20">FPS: 60 · Багов: 0</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-auto items-center">
+                  <div class="bg-[#0D1117] border border-white/15 rounded-xl p-4 font-mono text-xs space-y-1.5">
+                    <div class="text-gray-400 text-[11px] pb-1 border-b border-white/10">📄 game_loop.js (Commit #104)</div>
+                    <div class="text-gray-300">12 | const cornField = initCorn(100);</div>
+                    <div class="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">13 | let monsterSpeed = 5;</div>
+                    <div class="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">14 | renderAndroidHero();</div>
+                    <div class="text-gray-300">15 | updateHarvestUI();</div>
+                  </div>
+                  <div class="pixel-grid-bg rounded-xl p-4 h-36 border border-emerald-400/40 flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex justify-between text-[11px] font-mono">
+                      <span class="bg-black/60 px-2 py-0.5 rounded text-emerald-300">🌽 Урожай: 100%</span>
+                      <span class="bg-black/60 px-2 py-0.5 rounded text-rameev-lime">🤖 Герой: На посту</span>
+                    </div>
+                    <div class="flex items-center justify-around my-auto">
+                      <span class="text-3xl anim-patrol">🤖🛡️</span>
+                      <span class="text-2xl">🌽🌽🌽</span>
+                      <span class="text-2xl opacity-80">👾</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center text-xs text-gray-300">
+                  Всё работает идеально, потому что этот коммит сохранён в истории Git.
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 2. Случайная опечатка в коде',
+            narration: 'Кто-то решил поздно вечером поправить баланс: случайно вписал скорость монстра 999999 вместо 5 и нечаянно удалил строчку renderAndroidHero().',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-amber-300 border-b border-white/10 pb-2">
+                  <span>✏️ Редактирование файла в 23:45 (Commit #105)</span>
+                  <span class="px-2 py-0.5 rounded bg-amber-500/20">Случайная ошибка</span>
+                </div>
+                <div class="my-auto max-w-xl mx-auto w-full bg-[#0D1117] border-2 border-amber-400/60 rounded-2xl p-4 font-mono text-xs space-y-2 shadow-xl">
+                  <div class="text-gray-400 text-[11px] flex justify-between">
+                    <span>📄 game_loop.js — Внесение правок...</span>
+                    <span class="text-amber-300">Commit #105: "чуть-чуть ускорил игру"</span>
+                  </div>
+                  <div class="text-gray-400">12 | const cornField = initCorn(100);</div>
+                  <div class="text-amber-300 bg-amber-500/20 px-2 py-1 rounded font-bold">
+                    13 | let monsterSpeed = 999999; // Упс, залипла девятка!
+                  </div>
+                  <div class="text-red-400 line-through opacity-75 px-2">
+                    14 | // строка renderAndroidHero() случайно стёрта Backspace
+                  </div>
+                  <div class="text-gray-400">15 | updateHarvestUI();</div>
+                </div>
+                <div class="text-center text-xs font-mono text-amber-300">
+                  Нажимаем Push... И смотрим, что случилось с игрой на следующем шаге!
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 3. Катастрофа в игре!',
+            narration: 'ИБ-андроид исчез с экрана! Красные DDoS-монстры носятся со скоростью света и за долю секунды сжирают весь урожай кукурузы!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#241217] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-red-300 border-b border-red-400/30 pb-2">
+                  <span>🚨 CRITICAL BUG IN PRODUCTION (Commit #105)</span>
+                  <span class="px-2 py-0.5 rounded bg-red-600 text-white font-bold animate-pulse">УРОЖАЙ: 0% · ГЕРОЙ ПРОПАЛ</span>
+                </div>
+                <div class="pixel-grid-bg rounded-2xl p-5 h-44 my-auto border-2 border-red-500 relative overflow-hidden flex flex-col justify-between">
+                  <div class="flex justify-between text-xs font-mono z-10">
+                    <span class="bg-red-950/90 border border-red-500 px-2.5 py-0.5 rounded text-red-200">❌ Герой: НЕ ОТРИСОВАН</span>
+                    <span class="bg-red-950/90 border border-red-500 px-2.5 py-0.5 rounded text-red-200">⚡ Speed: 999999</span>
+                  </div>
+                  <div class="flex items-center justify-around my-auto">
+                    <span class="text-4xl anim-monster-crazy">👾</span>
+                    <span class="text-3xl anim-monster-crazy" style="animation-delay:0.1s">👾🔥</span>
+                    <span class="text-4xl anim-monster-crazy" style="animation-delay:0.2s">👾</span>
+                    <span class="text-3xl anim-monster-crazy" style="animation-delay:0.15s">🔥👾</span>
+                  </div>
+                  <div class="text-center text-xs font-mono text-red-300 bg-black/70 py-1 rounded">
+                    Вся кукуруза уничтожена за 0.001 секунды!
+                  </div>
+                </div>
+                <div class="text-center text-xs text-red-200">
+                  Без Git пришлось бы вручную перерывать сотни строк кода. А с Git включаем Diff!
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 4. Рентген кода (Git Diff)',
+            narration: 'Открываем историю коммитов на GitHub. Режим Git Diff мгновенно подсвечивает красным удалённую строчку героя и зелёным — ошибочную скорость 999999!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-rameev-blue border-b border-white/10 pb-2">
+                  <span>🔍 Режим рентгена: Git Diff (Сравнение #104 и #105)</span>
+                  <span class="text-rameev-lime">Найдено 2 изменённые строки за 1 сек</span>
+                </div>
+                <div class="my-auto max-w-2xl mx-auto w-full bg-[#0D1117] border border-white/20 rounded-2xl overflow-hidden font-mono text-xs shadow-2xl">
+                  <div class="bg-white/5 px-4 py-2 text-[11px] text-gray-300 flex justify-between border-b border-white/10">
+                    <span>Showing 1 changed file: <b>game_loop.js</b></span>
+                    <span>Автор: @dev_student · 2 мин назад</span>
+                  </div>
+                  <div class="p-4 space-y-1.5">
+                    <div class="text-gray-500">@@ -12,4 +12,3 @@ function updateGame()</div>
+                    <div class="bg-red-500/20 border-l-4 border-red-500 px-3 py-1 text-red-300">
+                      - let monsterSpeed = 5;
+                    </div>
+                    <div class="bg-emerald-500/20 border-l-4 border-emerald-500 px-3 py-1 text-emerald-300">
+                      + let monsterSpeed = 999999; <span class="ml-2 text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded">👈 ВОТ БАГ №1!</span>
+                    </div>
+                    <div class="bg-red-500/20 border-l-4 border-red-500 px-3 py-1 text-red-300">
+                      - renderAndroidHero(); <span class="ml-2 text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded">👈 СТЁРЛИ ГЕРОЯ!</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center text-xs font-mono text-rameev-lime">
+                  Git видит каждую букву. Осталось нажать одну кнопку «Revert»!
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 5. Мгновенный откат (Revert)',
+            narration: 'Нажимаем кнопку «Revert Commit #105»! Машина времени Git за 1 секунду отменяет сломанный коммит и возвращает рабочую точку сохранения #104.',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-gradient-to-br from-[#132920] to-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-emerald-300 border-b border-white/10 pb-2">
+                  <span>⏪ Выполнена команда: git revert #105</span>
+                  <span class="px-2 py-0.5 rounded bg-rameev-lime text-rameev-dark font-bold">Проект спасён за 5 секунд!</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 my-auto items-center">
+                  <div class="sm:col-span-5 bg-black/50 border border-emerald-400/40 rounded-2xl p-4 text-center space-y-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500 text-rameev-dark font-mono text-xs font-extrabold shadow">
+                      <i class="fa-solid fa-rotate-left"></i> Revert Commit #105
+                    </div>
+                    <p class="text-xs text-gray-300">
+                      Багованный коммит аннулирован. Восстановлены <code class="font-mono text-emerald-300">monsterSpeed = 5</code> и <code class="font-mono text-emerald-300">renderAndroidHero()</code>.
+                    </p>
+                  </div>
+                  <div class="sm:col-span-7 pixel-grid-bg rounded-2xl p-4 h-36 border-2 border-emerald-400 flex flex-col justify-between">
+                    <div class="flex justify-between text-xs font-mono">
+                      <span class="bg-black/70 px-2 py-0.5 rounded text-emerald-300">✅ ИБ-Андроид снова в строю!</span>
+                      <span class="bg-black/70 px-2 py-0.5 rounded text-rameev-lime">🌽 Урожай: 100%</span>
+                    </div>
+                    <div class="flex items-center justify-around my-auto">
+                      <span class="text-3xl anim-patrol">🤖🛡️</span>
+                      <span class="text-2xl">🌽🌽🌽</span>
+                      <span class="text-xl opacity-70">👾 (скорость: 5)</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center text-xs font-mono text-rameev-lime">
+                  💪 С Git не страшно экспериментировать: любой баг откатывается в один клик!
+                </div>
+              </div>
+            `
+          }
+        ]
+      },
+
+      // -----------------------------------------------------------------------
+      // МУЛЬТИК №4 (ТРЮК 3): ВЕТКИ (BRANCHES) И PULL REQUEST (5 ШАГОВ)
+      // -----------------------------------------------------------------------
+      {
+        id: 4,
+        badge: 'Мультик №4 · Трюк 3: Branches & Pull Request',
+        title: 'Магия веток: как 4 отдела работают параллельно',
+        subtitle: 'Как Разработка, Арт, Геймдизайн и Звук/QA создают игру одновременно и сливают всё в общий релиз',
+        steps: [
+          {
+            label: 'Шаг 1. Главный ствол main',
+            narration: 'В центре репозитория идёт главная ветка main — это стабильная версия «Kernel Valley», которую нельзя ломать сырыми экспериментами.',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-rameev-blue border-b border-white/10 pb-2">
+                  <span>🌳 Главная ветка репозитория: main</span>
+                  <span class="text-gray-400">Базовый мир игры v0.1</span>
+                </div>
+                <div class="my-auto flex flex-col items-center justify-center space-y-4">
+                  <svg width="560" height="110" viewBox="0 0 560 110" class="max-w-full">
+                    <line x1="60" y1="55" x2="500" y2="55" stroke="#7199F1" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="120" cy="55" r="14" fill="#2149A1" stroke="#FFFFFF" stroke-width="3"/>
+                    <circle cx="280" cy="55" r="14" fill="#2149A1" stroke="#FFFFFF" stroke-width="3"/>
+                    <circle cx="440" cy="55" r="16" fill="#EFFE74" stroke="#2149A1" stroke-width="4"/>
+                    <text x="120" y="92" text-anchor="middle" fill="#9CA3AF" font-size="11" font-family="JetBrains Mono">Init repo</text>
+                    <text x="280" y="92" text-anchor="middle" fill="#9CA3AF" font-size="11" font-family="JetBrains Mono">Базовая сетка</text>
+                    <text x="440" y="25" text-anchor="middle" fill="#EFFE74" font-size="12" font-weight="bold" font-family="JetBrains Mono">main (Стабильно)</text>
+                  </svg>
+                  <div class="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-gray-300">
+                    Правило студии: в ветке <code class="font-mono text-rameev-lime">main</code> всегда лежит только проверенная рабочая версия!
+                  </div>
+                </div>
+                <div class="text-center text-xs text-gray-400">
+                  Но как 12 человек будут делать новые фичи одновременно, не мешая друг другу?
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 2. Отделы создают свои ветки',
+            narration: 'От главной ветки main отпочковываются 3 параллельные ветки-песочницы: синяя для Разработки, фиолетовая для Арта и оранжевая для Геймдизайна!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-rameev-lime border-b border-white/10 pb-2">
+                  <span>🌿 Создание параллельных веток (git branch)</span>
+                  <span>У каждого отдела своя песочница</span>
+                </div>
+                <div class="my-auto flex flex-col items-center">
+                  <svg width="620" height="175" viewBox="0 0 620 175" class="max-w-full">
+                    <!-- main -->
+                    <line x1="40" y1="90" x2="580" y2="90" stroke="#4B5563" stroke-width="4" stroke-dasharray="6 4"/>
+                    <!-- Ветка Dev (верхняя) -->
+                    <path d="M120 90 C170 90, 185 30, 240 30 L470 30" stroke="#60A5FA" stroke-width="5" fill="none"/>
+                    <!-- Ветка Art (средняя-верхняя) -->
+                    <path d="M120 90 C170 90, 190 65, 250 65 L470 65" stroke="#C084FC" stroke-width="4" fill="none"/>
+                    <!-- Ветка GD (нижняя) -->
+                    <path d="M120 90 C170 90, 185 145, 240 145 L470 145" stroke="#FBBF24" stroke-width="5" fill="none"/>
+
+                    <circle cx="120" cy="90" r="12" fill="#FFFFFF"/>
+                    <circle cx="350" cy="30" r="10" fill="#60A5FA"/>
+                    <circle cx="350" cy="65" r="10" fill="#C084FC"/>
+                    <circle cx="350" cy="145" r="10" fill="#FBBF24"/>
+
+                    <text x="480" y="34" fill="#93C5FD" font-size="11" font-family="JetBrains Mono" font-weight="bold">dev/economy-combat</text>
+                    <text x="480" y="69" fill="#D8B4FE" font-size="11" font-family="JetBrains Mono" font-weight="bold">art/pixel-sprites-ui</text>
+                    <text x="480" y="94" fill="#9CA3AF" font-size="11" font-family="JetBrains Mono">main</text>
+                    <text x="480" y="149" fill="#FDE68A" font-size="11" font-family="JetBrains Mono" font-weight="bold">gd/village-dialogs</text>
+                  </svg>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-[11px] font-mono text-center">
+                  <div class="bg-blue-500/15 text-blue-300 py-1.5 rounded-lg">Dev: Саша Г., Илья, Данила, Ульяна, Алина</div>
+                  <div class="bg-purple-500/15 text-purple-300 py-1.5 rounded-lg">Art: Настя, Данир, Ульяна, Рамзиль</div>
+                  <div class="bg-amber-500/15 text-amber-300 py-1.5 rounded-lg">GD: Рамзиль, Саша К., Руслан</div>
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 3. Кипит работа в ветках',
+            narration: 'В каждой ветке параллельно появляются свои коммиты: в dev — конвейер и кукуруза, в art — спрайт ВАЛЛ-И и интерфейс Liquid Glass, в gd — квесты деревни.',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-gray-300 border-b border-white/10 pb-2">
+                  <span>⚡ Параллельные коммиты во всех отделах</span>
+                  <span class="text-emerald-300">Никто никому не мешает!</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-auto">
+                  <div class="bg-blue-950/50 border border-blue-400/40 rounded-xl p-3.5 space-y-2">
+                    <div class="text-xs font-mono font-bold text-blue-300">🌿 dev/economy-combat</div>
+                    <div class="text-xs bg-black/40 p-2 rounded flex items-center gap-2">
+                      <span>🌽</span> <span>Commit: Тайлы кукурузы + завод</span>
+                    </div>
+                    <div class="text-xs bg-black/40 p-2 rounded flex items-center gap-2">
+                      <span>⚔️</span> <span>Commit: HP героя и атака багов</span>
+                    </div>
+                  </div>
+                  <div class="bg-purple-950/50 border border-purple-400/40 rounded-xl p-3.5 space-y-2">
+                    <div class="text-xs font-mono font-bold text-purple-300">🌿 art/pixel-sprites-ui</div>
+                    <div class="text-xs bg-black/40 p-2 rounded flex items-center gap-2">
+                      <span>🤖</span> <span>Commit: Спрайт ИБ-андроида и ВАЛЛ-И</span>
+                    </div>
+                    <div class="text-xs bg-black/40 p-2 rounded flex items-center gap-2">
+                      <span>✨</span> <span>Commit: Панель Liquid Glass UI</span>
+                    </div>
+                  </div>
+                  <div class="bg-amber-950/50 border border-amber-400/40 rounded-xl p-3.5 space-y-2">
+                    <div class="text-xs font-mono font-bold text-amber-300">🌿 gd/village-dialogs</div>
+                    <div class="text-xs bg-black/40 p-2 rounded flex items-center gap-2">
+                      <span>📜</span> <span>Commit: 3 стартовых квеста ИБ</span>
+                    </div>
+                    <div class="text-xs bg-black/40 p-2 rounded flex items-center gap-2">
+                      <span>💬</span> <span>Commit: Реплики жителей деревни</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center text-xs text-gray-300">
+                  Когда фичи в ветках готовы — открываем <b>Pull Request</b> для проверки!
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 4. Pull Request и проверка QA',
+            narration: 'Открывается Pull Request #12. Отдел Звука и QA (Надежда Мосунова и Григорий Архиреев) тестируют сборку, добавляют 8-битный звук и ставят штамп «QA APPROVED»!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-[#161B26] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-emerald-300 border-b border-white/10 pb-2">
+                  <span>🛡️ Pull Request #12: Сборка обновления «Kernel Valley v1.0»</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20">Проверка QA-отделом</span>
+                </div>
+                <div class="my-auto max-w-xl mx-auto w-full bg-[#0D1117] border-2 border-emerald-400/60 rounded-2xl p-4 space-y-3 shadow-2xl">
+                  <div class="flex items-center justify-between">
+                    <div class="text-sm font-bold text-white">Вливаем ветки Dev + Art + GD + Sound в <code class="font-mono text-rameev-lime">main</code></div>
+                    <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-500 text-rameev-dark font-extrabold">✓ Checks passed</span>
+                  </div>
+                  <div class="bg-white/5 rounded-xl p-3 text-xs space-y-1.5">
+                    <div class="font-bold text-emerald-300">🎧 Отдел Звука и QA (Надежда Мосунова &amp; Григорий Архиреев):</div>
+                    <div class="text-gray-300">«Добавили 8-bit музыку деревни и звуки конвейера. Прототип запускается без ошибок, конфликтов в файлах нет!»</div>
+                  </div>
+                  <div class="flex items-center justify-between pt-1">
+                    <span class="text-xs font-mono text-emerald-400 font-bold">✅ QA APPROVED: Готово к слиянию</span>
+                    <span class="px-4 py-1.5 rounded-xl bg-emerald-500 text-rameev-dark font-mono text-xs font-black shadow animate-pulse">
+                      Merge pull request
+                    </span>
+                  </div>
+                </div>
+                <div class="text-center text-xs text-gray-300">
+                  Нажимаем зелёную кнопку <b>Merge pull request</b>!
+                </div>
+              </div>
+            `
+          },
+          {
+            label: 'Шаг 5. Слияние (Merge) — Общая игра готова!',
+            narration: 'Все цветные ветки сливаются обратно в main! В окне «Kernel Valley» одновременно соединяются код экономики, пиксельные спрайты, диалоги NPC и 8-битный саундтрек!',
+            render: () => `
+              <div class="h-full w-full flex flex-col justify-between p-5 bg-gradient-to-br from-[#132A22] via-[#161B26] to-[#1E2942] text-white">
+                <div class="flex items-center justify-between text-xs font-mono text-rameev-lime border-b border-white/10 pb-2">
+                  <span>🎉 Merge Complete! Все 4 отдела собрали единый билд в main</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500 text-rameev-dark font-bold">RELEASE v1.0 LIVE</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 my-auto items-center">
+                  <!-- Схема слияния веток -->
+                  <div class="sm:col-span-5 flex flex-col items-center">
+                    <svg width="260" height="130" viewBox="0 0 260 130">
+                      <path d="M20 65 L240 65" stroke="#7199F1" stroke-width="5"/>
+                      <path d="M40 65 C70 65, 80 20, 115 20 L155 20 C190 20, 200 65, 225 65" stroke="#60A5FA" stroke-width="4" fill="none"/>
+                      <path d="M55 65 C80 65, 90 110, 125 110 L165 110 C195 110, 205 65, 225 65" stroke="#FBBF24" stroke-width="4" fill="none"/>
+                      <circle cx="40" cy="65" r="8" fill="#FFFFFF"/>
+                      <circle cx="135" cy="20" r="7" fill="#60A5FA"/>
+                      <circle cx="145" cy="110" r="7" fill="#FBBF24"/>
+                      <circle cx="225" cy="65" r="12" fill="#EFFE74" stroke="#16A34A" stroke-width="4"/>
+                    </svg>
+                    <span class="text-xs font-mono text-emerald-300 font-bold">Все ветки влились в main!</span>
+                  </div>
+
+                  <!-- Финальное окно игры со всеми фичами -->
+                  <div class="sm:col-span-7 pixel-grid-bg rounded-2xl p-4 border-2 border-rameev-lime shadow-2xl space-y-2">
+                    <!-- Liquid Glass UI топ-бар -->
+                    <div class="bg-white/15 backdrop-blur-md rounded-lg px-3 py-1.5 flex items-center justify-between text-[11px] font-mono border border-white/20">
+                      <span>❤️ HP: 100/100</span>
+                      <span class="text-amber-300">🌽 Кукуруза: 250 шт.</span>
+                      <span class="text-emerald-300">🔊 8-Bit ON</span>
+                    </div>
+                    <div class="flex items-center justify-around py-2">
+                      <div class="text-center">
+                        <div class="text-3xl anim-patrol">🤖🛡️</div>
+                        <span class="text-[10px] font-mono text-rameev-lime">ИБ-Андроид</span>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-2xl anim-float">🚜🌽🏭</div>
+                        <span class="text-[10px] font-mono text-amber-300">ВАЛЛ-И &amp; Конвейер</span>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-2xl">👴💬</div>
+                        <span class="text-[10px] font-mono text-purple-300">Квест NPC</span>
+                      </div>
+                    </div>
+                    <div class="bg-black/65 rounded-lg px-3 py-1 text-[11px] font-mono text-gray-200">
+                      💬 <b>Председатель кибер-колхоза:</b> «Андроид, защити кукурузу от DDoS-жуков!»
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center text-xs font-mono text-rameev-lime">
+                  🚀 Вот почему весь мировой геймдев и IT работают через Git!
+                </div>
+              </div>
+            `
+          }
+        ]
+      }
+    ];
+
+    // Состояние каждого из 4 плееров мультиков
+    const playersState = {};
+
+    function initCartoonPlayers() {
+      const wrapper = document.getElementById('cartoons-wrapper');
+      wrapper.innerHTML = cartoonsConfig.map(c => {
+        playersState[c.id] = {
+          stepIndex: 0,
+          isPlaying: false,
+          speed: 1, // 0.5x, 1x, 1.5x
+          timer: null,
+          progress: 0,
+          progressInterval: null
+        };
+
+        return `
+          <article id="cartoon-box-${c.id}" class="scroll-mt-24 bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden">
+            <!-- Шапка окна мультика -->
+            <div class="bg-rameev-dark text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-white/10">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-rameev-lime text-rameev-dark font-bold">${c.badge}</span>
+                  <span id="player-status-${c.id}" class="text-xs font-mono text-gray-400">⏸ На паузе (Ручной режим)</span>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-extrabold mt-1">${c.title}</h3>
+                <p class="text-xs sm:text-sm text-gray-300 mt-0.5">${c.subtitle}</p>
+              </div>
+              <div class="font-mono text-sm font-bold px-3.5 py-1.5 rounded-xl bg-white/10 text-rameev-lime shrink-0">
+                Кадр <span id="player-step-num-${c.id}">1</span> из ${c.steps.length}
+              </div>
+            </div>
+
+            <!-- Сцена для анимации (Экран мультика) -->
+            <div id="player-stage-${c.id}" class="h-[340px] sm:h-[360px] w-full relative overflow-hidden stage-transition">
+              <!-- Отрисовывается функцией updateCartoonUI -->
+            </div>
+
+            <!-- Полоска прогресса автопроигрывания текущего шага -->
+            <div class="w-full h-1.5 bg-gray-200 overflow-hidden">
+              <div id="player-progress-${c.id}" class="h-full bg-rameev-blue transition-all duration-100" style="width: 0%"></div>
+            </div>
+
+            <!-- Субтитры / Голос ведущего -->
+            <div class="bg-rameev-soft/60 px-6 py-3.5 border-b border-gray-200 flex items-start gap-3">
+              <div class="w-7 h-7 rounded-lg bg-rameev-ink text-white flex items-center justify-center text-xs shrink-0 mt-0.5">
+                <i class="fa-solid fa-comment-dots"></i>
+              </div>
+              <div>
+                <div id="player-step-title-${c.id}" class="text-xs font-bold uppercase tracking-wider text-rameev-ink"></div>
+                <p id="player-narration-${c.id}" class="text-sm sm:text-base text-rameev-dark font-medium leading-snug mt-0.5"></p>
+              </div>
+            </div>
+
+            <!-- ПУЛЬТ УПРАВЛЕНИЯ МУЛЬТИКОМ -->
+            <div class="bg-rameev-surface px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+              
+              <!-- Основные кнопки: Заново / Шаг назад / Старт-Пауза / Шаг вперёд -->
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="cartoonReset(${c.id})" class="px-3.5 py-2.5 rounded-xl bg-white hover:bg-gray-100 text-rameev-dark border border-gray-300 font-bold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm" title="Сбросить мультик на 1-й кадр">
+                  <i class="fa-solid fa-backward-fast text-rameev-ink"></i> Заново
+                </button>
+
+                <button onclick="cartoonStep(${c.id}, -1)" class="px-3.5 py-2.5 rounded-xl bg-white hover:bg-gray-100 text-rameev-dark border border-gray-300 font-bold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm" title="Предыдущий шаг">
+                  <i class="fa-solid fa-step-backward"></i> Шаг назад
+                </button>
+
+                <button onclick="cartoonTogglePlay(${c.id})" id="player-play-btn-${c.id}" class="px-5 py-2.5 rounded-xl bg-rameev-ink hover:bg-rameev-dark text-white font-extrabold text-xs sm:text-sm transition flex items-center gap-2 shadow-md">
+                  <i class="fa-solid fa-play" id="player-play-icon-${c.id}"></i>
+                  <span id="player-play-text-${c.id}">Старт мультика</span>
+                </button>
+
+                <button onclick="cartoonStep(${c.id}, 1)" class="px-3.5 py-2.5 rounded-xl bg-white hover:bg-gray-100 text-rameev-dark border border-gray-300 font-bold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm" title="Следующий шаг">
+                  Шаг вперёд <i class="fa-solid fa-step-forward"></i>
+                </button>
+              </div>
+
+              <!-- Прямой выбор кадра (Кликабельные шаги) -->
+              <div class="flex items-center gap-1.5" id="player-dots-${c.id}">
+                ${c.steps.map((s, idx) => `
+                  <button onclick="cartoonGoTo(${c.id}, ${idx})" id="player-dot-${c.id}-${idx}"
+                          class="px-2.5 py-1.5 rounded-lg font-mono text-xs font-bold transition border"
+                          title="${s.label}">
+                    ${idx + 1}
+                  </button>
+                `).join('')}
+              </div>
+
+              <!-- Переключатель скорости -->
+              <div class="flex items-center gap-1 bg-white px-2.5 py-1.5 rounded-xl border border-gray-300 text-xs font-mono">
+                <span class="text-gray-500 mr-1">Скорость:</span>
+                ${[0.5, 1, 1.5].map(spd => `
+                  <button onclick="cartoonSetSpeed(${c.id}, ${spd})" id="player-spd-${c.id}-${String(spd).replace('.','_')}"
+                          class="px-2 py-0.5 rounded font-bold transition ${spd === 1 ? 'bg-rameev-blue text-white' : 'text-gray-600 hover:bg-gray-100'}">
+                    ${spd}x
+                  </button>
+                `).join('')}
+              </div>
+
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      // Инициализируем первый кадр каждого мультика
+      cartoonsConfig.forEach(c => updateCartoonUI(c.id));
+    }
+
+    function getCartoonById(id) {
+      return cartoonsConfig.find(c => c.id === id);
+    }
+
+    function updateCartoonUI(id) {
+      const config = getCartoonById(id);
+      const state = playersState[id];
+      const stepObj = config.steps[state.stepIndex];
+
+      // Обновляем сцену
+      const stage = document.getElementById(`player-stage-${id}`);
+      stage.innerHTML = stepObj.render();
+
+      // Обновляем заголовки и субтитры
+      document.getElementById(`player-step-num-${id}`).textContent = state.stepIndex + 1;
+      document.getElementById(`player-step-title-${id}`).textContent = stepObj.label;
+      document.getElementById(`player-narration-${id}`).textContent = stepObj.narration;
+
+      // Статус и кнопка Play/Pause
+      const statusEl = document.getElementById(`player-status-${id}`);
+      const playIcon = document.getElementById(`player-play-icon-${id}`);
+      const playText = document.getElementById(`player-play-text-${id}`);
+      const playBtn = document.getElementById(`player-play-btn-${id}`);
+
+      if (state.isPlaying) {
+        statusEl.textContent = '▶ Идёт автопоказ...';
+        statusEl.className = 'text-xs font-mono text-rameev-lime font-bold animate-pulse';
+        playIcon.className = 'fa-solid fa-pause';
+        playText.textContent = 'Пауза';
+        playBtn.className = 'px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-rameev-dark font-extrabold text-xs sm:text-sm transition flex items-center gap-2 shadow-md';
+      } else {
+        statusEl.textContent = '⏸ На паузе (Пошаговый режим)';
+        statusEl.className = 'text-xs font-mono text-gray-400';
+        playIcon.className = 'fa-solid fa-play';
+        playText.textContent = 'Старт мультика';
+        playBtn.className = 'px-5 py-2.5 rounded-xl bg-rameev-ink hover:bg-rameev-dark text-white font-extrabold text-xs sm:text-sm transition flex items-center gap-2 shadow-md';
+      }
+
+      // Подсветка кнопок номеров кадров
+      config.steps.forEach((_, idx) => {
+        const dot = document.getElementById(`player-dot-${id}-${idx}`);
+        if (idx === state.stepIndex) {
+          dot.className = 'px-2.5 py-1.5 rounded-lg font-mono text-xs font-bold transition border bg-rameev-ink text-white border-rameev-ink shadow-sm';
+        } else if (idx < state.stepIndex) {
+          dot.className = 'px-2.5 py-1.5 rounded-lg font-mono text-xs font-bold transition border bg-rameev-soft text-rameev-ink border-rameev-blue/40';
+        } else {
+          dot.className = 'px-2.5 py-1.5 rounded-lg font-mono text-xs font-bold transition border bg-white text-gray-600 border-gray-300 hover:bg-gray-100';
+        }
+      });
+    }
+
+    function stopCartoonTimer(id) {
+      const state = playersState[id];
+      clearInterval(state.progressInterval);
+      state.progressInterval = null;
+      state.progress = 0;
+      const bar = document.getElementById(`player-progress-${id}`);
+      if (bar) bar.style.width = '0%';
+    }
+
+    function startCartoonStepTimer(id) {
+      stopCartoonTimer(id);
+      const state = playersState[id];
+      const config = getCartoonById(id);
+      const baseDurationMs = 4500 / state.speed; // 4.5 секунды на шаг при 1x
+      const tickMs = 50;
+      const increment = (tickMs / baseDurationMs) * 100;
+
+      state.progressInterval = setInterval(() => {
+        state.progress += increment;
+        const bar = document.getElementById(`player-progress-${id}`);
+        if (bar) bar.style.width = `${Math.min(100, state.progress)}%`;
+
+        if (state.progress >= 100) {
+          if (state.stepIndex < config.steps.length - 1) {
+            state.stepIndex++;
+            updateCartoonUI(id);
+            startCartoonStepTimer(id);
+          } else {
+            // Дошли до конца мультика
+            state.isPlaying = false;
+            stopCartoonTimer(id);
+            updateCartoonUI(id);
+            showToast(`🎬 Мультик №${id} завершён! Можно обсудить с группой или нажать «Заново».`);
+          }
+        }
+      }, tickMs);
+    }
+
+    function cartoonTogglePlay(id) {
+      const state = playersState[id];
+      const config = getCartoonById(id);
+
+      // Ставим на паузу другие мультики, чтобы не играли одновременно
+      Object.keys(playersState).forEach(otherId => {
+        const numId = Number(otherId);
+        if (numId !== id && playersState[numId].isPlaying) {
+          playersState[numId].isPlaying = false;
+          stopCartoonTimer(numId);
+          updateCartoonUI(numId);
+        }
+      });
+
+      if (state.isPlaying) {
+        state.isPlaying = false;
+        stopCartoonTimer(id);
+      } else {
+        if (state.stepIndex >= config.steps.length - 1) {
+          state.stepIndex = 0;
+        }
+        state.isPlaying = true;
+        startCartoonStepTimer(id);
+      }
+      updateCartoonUI(id);
+    }
+
+    function cartoonReset(id) {
+      const state = playersState[id];
+      state.isPlaying = false;
+      state.stepIndex = 0;
+      stopCartoonTimer(id);
+      updateCartoonUI(id);
+    }
+
+    function cartoonStep(id, delta) {
+      const state = playersState[id];
+      const config = getCartoonById(id);
+      state.isPlaying = false;
+      stopCartoonTimer(id);
+      const next = state.stepIndex + delta;
+      if (next >= 0 && next < config.steps.length) {
+        state.stepIndex = next;
+      }
+      updateCartoonUI(id);
+    }
+
+    function cartoonGoTo(id, index) {
+      const state = playersState[id];
+      state.isPlaying = false;
+      stopCartoonTimer(id);
+      state.stepIndex = index;
+      updateCartoonUI(id);
+    }
+
+    function cartoonSetSpeed(id, spd) {
+      const state = playersState[id];
+      state.speed = spd;
+      [0.5, 1, 1.5].forEach(s => {
+        const btn = document.getElementById(`player-spd-${id}-${String(s).replace('.','_')}`);
+        if (s === spd) {
+          btn.className = 'px-2 py-0.5 rounded font-bold transition bg-rameev-blue text-white';
+        } else {
+          btn.className = 'px-2 py-0.5 rounded font-bold transition text-gray-600 hover:bg-gray-100';
+        }
+      });
+      if (state.isPlaying) {
+        startCartoonStepTimer(id);
+      }
+    }
+
+    // =========================================================================
+    // 3. ЖИВАЯ ПЕСОЧНИЦА ГРАФА КОММИТОВ (В СТИЛЕ LEARN GIT BRANCHING)
+    // =========================================================================
+    let sandboxState = {
+      activeBranch: 'main',
+      hasFeatureBranch: false,
+      featureMerged: false,
+      nodes: [
+        { id: 'C0', branch: 'main', x: 70, y: 65, parent: null },
+        { id: 'C1', branch: 'main', x: 165, y: 65, parent: 'C0' }
+      ],
+      headMain: 'C1',
+      headFeature: null,
+      counter: 2
+    };
+
+    function renderSandboxGraph() {
+      const svg = document.getElementById('sandbox-svg');
+      const linesHtml = [];
+      const nodesHtml = [];
+
+      const findNode = (id) => sandboxState.nodes.find(n => n.id === id);
+
+      // Рисуем связи (стрелки/кривые)
+      sandboxState.nodes.forEach(n => {
+        if (n.parent) {
+          const p = findNode(n.parent);
+          if (p) {
+            const color = n.branch === 'main' ? '#7199F1' : '#C084FC';
+            linesHtml.push(`<path d="M ${p.x} ${p.y} C ${(p.x+n.x)/2} ${p.y}, ${(p.x+n.x)/2} ${n.y}, ${n.x} ${n.y}" stroke="${color}" stroke-width="4" fill="none"/>`);
+          }
+        }
+        if (n.secondParent) {
+          const p2 = findNode(n.secondParent);
+          if (p2) {
+            linesHtml.push(`<path d="M ${p2.x} ${p2.y} C ${(p2.x+n.x)/2} ${p2.y}, ${(p2.x+n.x)/2} ${n.y}, ${n.x} ${n.y}" stroke="#34D399" stroke-width="4" stroke-dasharray="5 3" fill="none"/>`);
+          }
+        }
+      });
+
+      // Рисуем кружки коммитов
+      sandboxState.nodes.forEach(n => {
+        const isMain = n.branch === 'main';
+        const fill = n.isMerge ? '#34D399' : (isMain ? '#2149A1' : '#7E22CE');
+        const stroke = n.isMerge ? '#EFFE74' : (isMain ? '#7199F1' : '#D8B4FE');
+        nodesHtml.push(`
+          <g>
+            <circle cx="${n.x}" cy="${n.y}" r="18" fill="${fill}" stroke="${stroke}" stroke-width="3"/>
+            <text x="${n.x}" y="${n.y + 4}" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="bold" font-family="JetBrains Mono">${n.id}</text>
+          </g>
+        `);
+      });
+
+      // Бейдж ветки main
+      const mainTip = findNode(sandboxState.headMain);
+      if (mainTip) {
+        const isCurrent = sandboxState.activeBranch === 'main';
+        nodesHtml.push(`
+          <g transform="translate(${mainTip.x - 32}, ${mainTip.y - 44})">
+            <rect width="64" height="20" rx="5" fill="${isCurrent ? '#EFFE74' : '#374151'}"/>
+            <text x="32" y="14" text-anchor="middle" fill="${isCurrent ? '#161B26' : '#E5E7EB'}" font-size="10" font-weight="bold" font-family="JetBrains Mono">main${isCurrent ? '*' : ''}</text>
+          </g>
+        `);
+      }
+
+      // Бейдж ветки feature
+      if (sandboxState.hasFeatureBranch && sandboxState.headFeature) {
+        const featTip = findNode(sandboxState.headFeature);
+        if (featTip) {
+          const isCurrent = sandboxState.activeBranch === 'feature';
+          nodesHtml.push(`
+            <g transform="translate(${featTip.x - 38}, ${featTip.y + 26})">
+              <rect width="76" height="20" rx="5" fill="${isCurrent ? '#EFFE74' : '#581C87'}"/>
+              <text x="38" y="14" text-anchor="middle" fill="${isCurrent ? '#161B26' : '#F3E8FF'}" font-size="10" font-weight="bold" font-family="JetBrains Mono">feature${isCurrent ? '*' : ''}</text>
+            </g>
+          `);
+        }
+      }
+
+      svg.innerHTML = linesHtml.join('') + nodesHtml.join('');
+
+      // Обновляем подписи кнопок
+      document.getElementById('sandbox-head-indicator').textContent = `HEAD -> ${sandboxState.activeBranch}`;
+      document.getElementById('checkout-target-label').textContent = sandboxState.activeBranch === 'main' ? 'feature' : 'main';
+    }
+
+    function sandboxAction(type) {
+      const term = document.getElementById('sandbox-terminal-text');
+
+      if (type === 'reset') {
+        sandboxState = {
+          activeBranch: 'main',
+          hasFeatureBranch: false,
+          featureMerged: false,
+          nodes: [
+            { id: 'C0', branch: 'main', x: 70, y: 65, parent: null },
+            { id: 'C1', branch: 'main', x: 165, y: 65, parent: 'C0' }
+          ],
+          headMain: 'C1',
+          headFeature: null,
+          counter: 2
+        };
+        term.textContent = 'Граф сброшен в начальное состояние. Текущая ветка: main';
+        renderSandboxGraph();
+        return;
+      }
+
+      if (sandboxState.nodes.length >= 7 && type !== 'checkout') {
+        showToast('Достигнут предел ширины демо-графа. Нажми «Сброс», чтобы построить новое дерево!');
+        return;
+      }
+
+      if (type === 'commit') {
+        const newId = 'C' + sandboxState.counter++;
+        const lastX = Math.max(...sandboxState.nodes.map(n => n.x));
+        const nextX = lastX + 85;
+        if (sandboxState.activeBranch === 'main') {
+          sandboxState.nodes.push({ id: newId, branch: 'main', x: nextX, y: 65, parent: sandboxState.headMain });
+          sandboxState.headMain = newId;
+          term.textContent = `git commit: создан сейв ${newId} в ветке main`;
+        } else {
+          sandboxState.nodes.push({ id: newId, branch: 'feature', x: nextX, y: 135, parent: sandboxState.headFeature });
+          sandboxState.headFeature = newId;
+          term.textContent = `git commit: создан сейв ${newId} в песочнице feature`;
+        }
+      } else if (type === 'branch') {
+        if (sandboxState.hasFeatureBranch) {
+          showToast('Ветка feature уже создана! Нажми git checkout feature, чтобы перейти в неё.');
+          return;
+        }
+        sandboxState.hasFeatureBranch = true;
+        sandboxState.headFeature = sandboxState.headMain;
+        sandboxState.activeBranch = 'feature';
+        term.textContent = 'git branch feature && git checkout feature: создана и выбрана ветка feature!';
+      } else if (type === 'checkout') {
+        if (!sandboxState.hasFeatureBranch) {
+          sandboxState.hasFeatureBranch = true;
+          sandboxState.headFeature = sandboxState.headMain;
+        }
+        sandboxState.activeBranch = sandboxState.activeBranch === 'main' ? 'feature' : 'main';
+        term.textContent = `git checkout ${sandboxState.activeBranch}: переключились на ветку ${sandboxState.activeBranch}`;
+      } else if (type === 'merge') {
+        if (!sandboxState.hasFeatureBranch || sandboxState.headFeature === sandboxState.headMain) {
+          showToast('Сначала создай ветку feature и сделай в ней хотя бы один git commit!');
+          return;
+        }
+        sandboxState.activeBranch = 'main';
+        const newId = 'M' + sandboxState.counter++;
+        const lastX = Math.max(...sandboxState.nodes.map(n => n.x));
+        sandboxState.nodes.push({
+          id: newId,
+          branch: 'main',
+          x: lastX + 85,
+          y: 65,
+          parent: sandboxState.headMain,
+          secondParent: sandboxState.headFeature,
+          isMerge: true
+        });
+        sandboxState.headMain = newId;
+        sandboxState.featureMerged = true;
+        term.textContent = `git merge feature: ветка feature успешно влита в main (коммит слияния ${newId})!`;
+        const badge = document.getElementById('sandbox-quest-badge');
+        badge.className = 'text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-bold';
+        badge.textContent = '🏆 Квест выполнен! Ты освоил ветвление и Merge!';
+        showToast('🎉 Отлично! Ветка feature влита в main — точно так же вы будете проходить Learn Git Branching!');
+      }
+
+      renderSandboxGraph();
+    }
+
+    // --- КОПИРОВАНИЕ ДОМАШНЕГО ЗАДАНИЯ В БУФЕР ОБМЕНА ДЛЯ TELEGRAM ---
+    function copyHomeworkToClipboard() {
+      const text = [
+        '🎮 КВЕСТ НА НЕДЕЛЮ: Укрощаем Git и ветки!',
+        '',
+        'Чтобы на следующем этапе мы собрали все наработки «Kernel Valley: Урожай багов» в единый проект без потерь, прокачиваем Git на интерактивном тренажёре:',
+        '👉 https://learngitbranching.js.org/?locale=ru_RU',
+        '',
+        '🌟 Базовый минимум для ВСЕХ отделов (Арт, Геймдизайн, Звук/QA, Разработка):',
+        '— Пройти вкладку «Основная» -> блок «Введение» (Уровни 1–4: коммиты, ветки, merge, rebase).',
+        '— Скинуть скриншот с зелёными галочками в этот чат!',
+        '',
+        '🚀 Профи-уровень для Отдела разработки (Dev):',
+        '— Дополнительно пройти блок «Едем дальше» и вкладку «Удалённые репозитории» (Push & Pull).',
+        '— Зарегистрировать аккаунт на GitHub и скинуть ссылку на свой профиль в чат.'
+      ].join('\n');
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('📋 Готовый пост с домашним заданием скопирован! Можно сразу вставлять в Telegram-чат студии.');
+      } catch (err) {
+        showToast('Не удалось скопировать автоматически.');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // Горячие клавиши 1-4 для быстрой прокрутки к нужному мультику во время занятия
+    window.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+      if (['1', '2', '3', '4'].includes(e.key)) {
+        const el = document.getElementById(`cartoon-box-${e.key}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
+    // Инициализация при загрузке страницы
+    window.onload = function () {
+      renderDepartments();
+      initCartoonPlayers();
+      renderSandboxGraph();
+    };
+  </script>
+</body>
+</html>

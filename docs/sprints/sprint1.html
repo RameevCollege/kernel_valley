@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Инди-студия Колледжа · Kernel Valley: Урожай багов</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       ФИРМЕННАЯ ДИЗАЙН-СИСТЕМА ЦИФРОВОГО КОЛЛЕДЖА ИМ. БАШИРА РАМЕЕВА
+       Светлая тема (корпоративный стандарт) + Тёмная тема (Liquid Glass со штурма)
+       ========================================================================== */
+    :root {
+      --brand-blue: #7199F1;
+      --brand-blue-2: #83A3F1;
+      --brand-filament: #2149A1;
+      --brand-lime: #EFFE74;
+      --brand-grey: #F4F5F7;
+      --brand-black: #222222;
+      --brand-white: #FFFFFF;
+
+      --bg-page: #F4F5F7;
+      --bg-surface: #FFFFFF;
+      --bg-surface-2: #E5ECFA;
+      --bg-surface-3: #D5E0F8;
+      --text-main: #222222;
+      --text-muted: #4F5B72;
+      --text-accent: #2149A1;
+      --border-color: #D4DCED;
+      --banner-grad: linear-gradient(180deg, #83A3F1 0%, #E5ECFA 58%, #F4F5F7 100%);
+      --card-shadow: 0 4px 20px -2px rgba(33, 73, 161, 0.07);
+      --glass-blur: none;
+    }
+
+    html[data-theme="dark"] {
+      --bg-page: #14161B;
+      --bg-surface: rgba(28, 32, 42, 0.72);
+      --bg-surface-2: rgba(39, 49, 74, 0.65);
+      --bg-surface-3: rgba(54, 70, 109, 0.55);
+      --text-main: #F4F5F7;
+      --text-muted: #A3ADC2;
+      --text-accent: #8FAEF5;
+      --border-color: rgba(113, 153, 241, 0.26);
+      --banner-grad: radial-gradient(circle at 20% 0%, rgba(113, 153, 241, 0.32) 0%, rgba(20, 22, 27, 0.95) 70%);
+      --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.38);
+      --glass-blur: blur(16px);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .studio-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: 16px;
+      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.25s ease;
+    }
+
+    .studio-card-soft {
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-color);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: 14px;
+    }
+
+    .hero-banner {
+      background: var(--banner-grad);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .lime-badge {
+      background-color: var(--brand-lime);
+      color: #222222;
+      font-weight: 700;
+    }
+
+    .btn-primary {
+      background-color: var(--brand-filament);
+      color: #FFFFFF;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    html[data-theme="dark"] .btn-primary {
+      background-color: var(--brand-blue);
+      color: #14161B;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .tab-btn {
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      transition: all 0.18s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--brand-lime);
+      color: #222222;
+      border-color: #222222;
+      font-weight: 700;
+    }
+
+    html[data-theme="dark"] .tab-btn.active {
+      border-color: var(--brand-lime);
+    }
+
+    /* Highlighted member card when selected in personal filter */
+    .member-card.highlighted {
+      border: 2px solid var(--brand-filament);
+      box-shadow: 0 0 0 4px rgba(113, 153, 241, 0.28);
+      transform: translateY(-2px);
+    }
+
+    html[data-theme="dark"] .member-card.highlighted {
+      border: 2px solid var(--brand-lime);
+      box-shadow: 0 0 0 4px rgba(239, 254, 116, 0.2);
+    }
+
+    /* Custom Checkbox */
+    .task-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--brand-blue);
+      border-radius: 6px;
+      background: var(--bg-surface);
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .task-checkbox:checked {
+      background-color: var(--brand-lime);
+      border-color: #222222;
+    }
+
+    .task-checkbox:checked::before {
+      content: "✓";
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 800;
+      color: #222222;
+    }
+
+    .task-row.done .task-text {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    /* Pixel-art grid mini preview */
+    .pixel-grid {
+      background-size: 24px 24px;
+      background-image:
+        linear-gradient(to right, rgba(113, 153, 241, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(113, 153, 241, 0.15) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ О КОПИРОВАНИИ (БЕЗ ALERT) -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border border-[#222222] lime-badge transition-all duration-300">
+    <span class="mono text-lg">📋</span>
+    <span id="toastText" class="text-sm font-bold">Скопировано в буфер обмена!</span>
+  </div>
+
+  <!-- НАВИГАЦИОННАЯ ШАПКА -->
+  <header class="sticky top-0 z-40 border-b border-[var(--border-color)] bg-[var(--bg-surface)] backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Фирменный знак Колледжа и Студии -->
+      <a href="#top" class="flex items-center gap-3 text-decoration-none group">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-sm mono bg-[#222222] text-[#EFFE74] border border-[#7199F1] shrink-0">
+          КВ
+        </div>
+        <div>
+          <div class="text-xs font-extrabold tracking-wider uppercase" style="color: var(--text-accent);">
+            ЦИФРОВОЙ КОЛЛЕДЖ им. Башира Рамеева
+          </div>
+          <div class="text-sm font-bold flex items-center gap-2">
+            <span>Инди-студия · Kernel Valley</span>
+            <span class="mono text-[11px] px-2 py-0.5 rounded lime-badge">Спринт #1</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Навигация по блокам -->
+      <nav class="hidden lg:flex items-center gap-1 text-xs font-semibold">
+        <a href="#concept" class="px-3 py-2 rounded-lg hover:bg-[var(--bg-surface-2)] transition">Концепт игры</a>
+        <a href="#roster" class="px-3 py-2 rounded-lg hover:bg-[var(--bg-surface-2)] transition">Отделы и списки (12)</a>
+        <a href="#tasks" class="px-3 py-2 rounded-lg hover:bg-[var(--bg-surface-2)] transition">ТЗ на неделю</a>
+        <a href="#prompt-builder" class="px-3 py-2 rounded-lg hover:bg-[var(--bg-surface-2)] transition">Генератор промпта MVP</a>
+        <a href="#roadmap" class="px-3 py-2 rounded-lg hover:bg-[var(--bg-surface-2)] transition">План спринтов</a>
+      </nav>
+
+      <!-- Переключатель темы (идея со штурма ребят: Тёмная тема + Liquid Glass) -->
+      <button id="themeToggle" type="button" class="px-3.5 py-2 rounded-xl text-xs font-bold mono flex items-center gap-2 border border-[var(--border-color)] bg-[var(--bg-surface-2)] hover:opacity-90 transition cursor-pointer">
+        <span id="themeIcon">🌙</span>
+        <span id="themeLabel">Liquid Glass (Тёмная)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- БЛОК 1. ГЛАВНЫЙ БАННЕР + ПЕРСОНАЛЬНЫЙ ФИЛЬТР УЧАСТНИКА -->
+  <section id="top" class="hero-banner py-10 sm:py-14">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Левая часть: приветствие и суть проекта -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="inline-flex flex-wrap items-center gap-2">
+            <span class="mono text-xs uppercase px-3 py-1 rounded-full lime-badge">
+              2D Pixel-Art Top-Down RPG / Симулятор
+            </span>
+            <span class="mono text-xs px-3 py-1 rounded-full bg-[#222222] text-white">
+              Дедлайн MVP: ко вторнику
+            </span>
+          </div>
+
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+            Kernel Valley: <span style="color: var(--text-accent);">Урожай багов</span>
+          </h1>
+
+          <p class="text-base sm:text-lg leading-relaxed" style="color: var(--text-muted);">
+            Командный хаб нашей инди-студии. Мы объединили все безумные идеи со штурма в один проект: 
+            <strong>симулятор советского ИБ-андроида в кибер-деревне</strong>, где уязвимости, телефонные мошенники и DDoS-монстры воруют кукурузу, а игрок строит конвейеры и сам рисует себе роботов-помощников.
+          </p>
+
+          <!-- Быстрые плашки ключевых правил недели -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+            <div class="studio-card p-3.5">
+              <div class="mono text-xs uppercase" style="color: var(--text-muted);">Формат недели</div>
+              <div class="text-base font-extrabold mt-0.5">Свой живой MVP</div>
+              <div class="text-xs mt-0.5" style="color: var(--text-muted);">Lovable / DeepSeek / Godot</div>
+            </div>
+            <div class="studio-card p-3.5">
+              <div class="mono text-xs uppercase" style="color: var(--text-muted);">Команда релиза</div>
+              <div class="text-base font-extrabold mt-0.5">12 разработчиков</div>
+              <div class="text-xs mt-0.5" style="color: var(--text-muted);">4 отдела + совмещения</div>
+            </div>
+            <div class="studio-card p-3.5 col-span-2 sm:col-span-1">
+              <div class="mono text-xs uppercase" style="color: var(--text-muted);">Сбор и ревью</div>
+              <div class="text-base font-extrabold mt-0.5">Следующий вторник</div>
+              <div class="text-xs mt-0.5" style="color: var(--text-muted);">11 класс — чек в четверг</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Правая часть: Персональный фильтр «Мой профиль в студии» -->
+        <div class="lg:col-span-5">
+          <div class="studio-card p-6 border-2 border-[#7199F1]">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="mono text-xs font-bold uppercase tracking-wider" style="color: var(--text-accent);">
+                🎯 Быстрый поиск задач
+              </span>
+              <span class="mono text-xs px-2 py-0.5 rounded lime-badge">Персональный режим</span>
+            </div>
+
+            <label for="memberSelect" class="block text-lg font-extrabold mb-2">
+              Найди себя в списке студии:
+            </label>
+            <select id="memberSelect" class="w-full p-3.5 rounded-xl font-semibold text-sm border border-[var(--border-color)] bg-[var(--bg-page)] text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-[#7199F1] cursor-pointer">
+              <option value="">— Выбери своё имя (все 12 участников) —</option>
+            </select>
+
+            <!-- Динамическая карточка выбранного участника -->
+            <div id="personalCard" class="mt-4 p-4 rounded-xl studio-card-soft hidden space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div id="pName" class="text-lg font-extrabold"></div>
+                  <div id="pGroup" class="mono text-xs" style="color: var(--text-muted);"></div>
+                </div>
+                <div id="pBadges" class="flex flex-wrap gap-1.5"></div>
+              </div>
+              <div class="text-xs sm:text-sm leading-relaxed border-t border-[var(--border-color)] pt-2.5">
+                <span class="font-bold">Твой фокус на эту неделю:</span>
+                <p id="pFocus" class="mt-1" style="color: var(--text-muted);"></p>
+              </div>
+              <div id="pDualWarning" class="hidden p-2.5 rounded-lg bg-[#EFFE74] text-[#222222] text-xs font-bold">
+                ⚡ Ты совмещаешь 2 отдела! Не забудь заглянуть в оба ТЗ, чтобы не подвести команды.
+              </div>
+              <div class="flex flex-wrap gap-2 pt-1">
+                <a href="#tasks" id="pJumpBtn" class="btn-primary text-xs px-4 py-2.5 rounded-lg inline-flex items-center gap-1.5">
+                  <span>Перейти к моему ТЗ</span>
+                  <span>→</span>
+                </a>
+                <a href="#prompt-builder" class="text-xs font-bold px-3.5 py-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--bg-surface)] hover:opacity-80 transition">
+                  Собрать промпт MVP
+                </a>
+              </div>
+            </div>
+
+            <!-- Подсказка по умолчанию, пока никто не выбран -->
+            <div id="personalEmpty" class="mt-4 p-3.5 rounded-xl border border-dashed border-[var(--border-color)] text-xs leading-relaxed" style="color: var(--text-muted);">
+              Выбери своё имя выше — сайт сразу покажет твои отделы (с учётом всех перестановок на встрече), личный фокус и откроет нужную вкладку ТЗ.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-16 flex-grow">
+
+    <!-- БЛОК 2. КОНЦЕПТ ПРОЕКТА «KERNEL VALLEY: УРОЖАЙ БАГОВ» -->
+    <section id="concept" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+        <div>
+          <div class="mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-accent);">
+            // 01 · Генеральный концепт со штурма
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">
+            Что мы разрабатываем: «Kernel Valley: Урожай багов»
+          </h2>
+        </div>
+        <div class="mono text-xs px-3 py-1.5 rounded-lg studio-card-soft">
+          Референсы: <strong>Stardew Valley</strong> + <strong>Factorio</strong> + <strong>ИБ</strong>
+        </div>
+      </div>
+
+      <!-- Описание сеттинга + Интерактивная схема тайла кибер-деревни -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div class="lg:col-span-7 studio-card p-6 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <span class="mono text-xs px-2.5 py-1 rounded lime-badge">Лор и сеттинг</span>
+            <h3 class="text-xl font-extrabold">
+              Списанный советский ИБ-андроид на страже кибер-деревни
+            </h3>
+            <p class="text-sm sm:text-base leading-relaxed" style="color: var(--text-muted);">
+              Главного героя — старого доброго робота-антивируса (ИБ-андроида) — отправляют в захолустную <strong>кибер-деревню на окраине сети</strong>. Здесь творится чертовщина: компьютерные баги, уязвимости, телефонные мошенники и кривые скрипты обрели физическую форму и буквально ломают деревню.
+            </p>
+            <p class="text-sm sm:text-base leading-relaxed" style="color: var(--text-muted);">
+              Нам предстоит чинить чужие ошибки в коде мироздания, защищать колхозные поля с кукурузой от DDoS-монстров, строить автоматизированные конвейеры-фаерволы и прокачивать своё жилище.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl studio-card-soft flex flex-wrap items-center justify-between gap-3">
+            <div class="text-xs sm:text-sm">
+              <strong>Главное правило этого спринта:</strong> мы пока не режем идеи! Каждый собирает MVP так, как видит этот мир, и приносит свои самые безумные фичи во вторник.
+            </div>
+          </div>
+        </div>
+
+        <!-- Интерактивный симулятор тайловой карты 2D Top-Down -->
+        <div class="lg:col-span-5 studio-card p-5 flex flex-col justify-between pixel-grid">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <span class="mono text-xs font-bold uppercase" style="color: var(--text-accent);">
+              Интерактивный макет сцены (2D Top-Down)
+            </span>
+            <span class="mono text-[11px] px-2 py-0.5 rounded bg-[#222222] text-[#EFFE74]">Кликни на объект</span>
+          </div>
+
+          <!-- Игровое поле 4x3 тайла -->
+          <div class="grid grid-cols-4 gap-2 my-auto" id="InteractiveMap">
+            <button type="button" data-tile="hero" class="p-3 rounded-xl border-2 border-[#2149A1] bg-[var(--bg-surface)] hover:scale-105 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span class="text-2xl">🤖</span>
+              <span class="mono text-[10px] font-bold">Андроид</span>
+            </button>
+            <button type="button" data-tile="corn" class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:scale-105 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span class="text-2xl">🌽</span>
+              <span class="mono text-[10px] font-bold">Кукуруза</span>
+            </button>
+            <button type="button" data-tile="ddos" class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:scale-105 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span class="text-2xl">👾</span>
+              <span class="mono text-[10px] font-bold">DDoS-Баг</span>
+            </button>
+            <button type="button" data-tile="factory" class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:scale-105 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span class="text-2xl">⚙️</span>
+              <span class="mono text-[10px] font-bold">Конвейер</span>
+            </button>
+            <button type="button" data-tile="walle" class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:scale-105 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span class="text-2xl">🎨</span>
+              <span class="mono text-[10px] font-bold">Нарисованный</span>
+            </button>
+            <button type="button" data-tile="npc" class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:scale-105 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span class="text-2xl">👵</span>
+              <span class="mono text-[10px] font-bold">Житель NPC</span>
+            </button>
+            <button type="button" data-tile="shop" class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:scale-105 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span class="text-2xl">🏪</span>
+              <span class="mono text-[10px] font-bold">Сельпо-Лавка</span>
+            </button>
+            <button type="button" data-tile="house" class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:scale-105 transition flex flex-col items-center justify-center gap-1 cursor-pointer">
+              <span class="text-2xl">🏠</span>
+              <span class="mono text-[10px] font-bold">База-Дом</span>
+            </button>
+          </div>
+
+          <div id="tileInfoBox" class="mt-3 p-3 rounded-xl bg-[#222222] text-white text-xs mono leading-relaxed">
+            <span class="text-[#EFFE74] font-bold">[🤖 ИБ-Андроид]:</span> Главный герой с видом сверху. Ходит по тайлам, чинит баги, отбивает атаки мошенников и следит за урожаем.
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 карточки ключевых столпов геймплея -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="studio-card p-5 space-y-2 border-t-4 border-t-[#2149A1]">
+          <div class="flex items-center justify-between">
+            <span class="text-2xl">🛡️</span>
+            <span class="mono text-xs px-2 py-0.5 rounded studio-card-soft">ИБ & Экшен</span>
+          </div>
+          <h4 class="text-base font-extrabold">Кибербез и бой с багами</h4>
+          <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-muted);">
+            Поиск уязвимостей на локации, исправление чужих ошибок, защита жителей от телефонных/сетевых мошенников, сражения с глючными кибер-монстрами и точная система повреждений.
+          </p>
+        </div>
+
+        <div class="studio-card p-5 space-y-2 border-t-4 border-t-[#7199F1]">
+          <div class="flex items-center justify-between">
+            <span class="text-2xl">🌽</span>
+            <span class="mono text-xs px-2 py-0.5 rounded studio-card-soft">Ферма & Заводы</span>
+          </div>
+          <h4 class="text-base font-extrabold">Кукуруза и конвейеры</h4>
+          <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-muted);">
+            Выращивание кукурузы (и охрана полей от воровства!), конструирование заводов, конвейеров и защитных установок в духе Factorio, прокачка жилища и развитие деревни.
+          </p>
+        </div>
+
+        <div class="studio-card p-5 space-y-2 border-t-4 border-t-[#2149A1]">
+          <div class="flex items-center justify-between">
+            <span class="text-2xl">🎨</span>
+            <span class="mono text-xs px-2 py-0.5 rounded lime-badge">Фишка игры</span>
+          </div>
+          <h4 class="text-base font-extrabold">Нарисуй себе помощника</h4>
+          <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-muted);">
+            Встроенная часть с рисованием: герой открывает холст, рисует будущего робота-дрона (в духе ВАЛЛ-И) или нанимает работников, которые помогают автоматизировать ферму и оборону.
+          </p>
+        </div>
+
+        <div class="studio-card p-5 space-y-2 border-t-4 border-t-[#7199F1]">
+          <div class="flex items-center justify-between">
+            <span class="text-2xl">🌐</span>
+            <span class="mono text-xs px-2 py-0.5 rounded studio-card-soft">Мир & NPC</span>
+          </div>
+          <h4 class="text-base font-extrabold">Процедурный мир и лор</h4>
+          <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-muted);">
+            Компактный открытый мир с частичной процедурной генерацией участков/файлов, колоритные характеры жителей деревни и смешные диалоги (вплоть до DLC про космос в будущем!).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- БЛОК 3. АКТУАЛЬНЫЕ СПИСКИ ПО ОТДЕЛАМ СТУДИИ -->
+    <section id="roster" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+        <div>
+          <div class="mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-accent);">
+            // 02 · Команда релиза (с учётом всех перестановок)
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">
+            Актуальные списки по отделам студии
+          </h2>
+        </div>
+
+        <!-- Кнопки фильтрации по отделам -->
+        <div class="flex flex-wrap gap-2" id="rosterTabs">
+          <button type="button" data-filter="all" class="tab-btn active px-3.5 py-2 rounded-xl text-xs mono cursor-pointer">
+            Все (12)
+          </button>
+          <button type="button" data-filter="dev" class="tab-btn px-3.5 py-2 rounded-xl text-xs mono cursor-pointer">
+            💻 Разработка (5)
+          </button>
+          <button type="button" data-filter="gd" class="tab-btn px-3.5 py-2 rounded-xl text-xs mono cursor-pointer">
+            📝 Геймдизайн (3)
+          </button>
+          <button type="button" data-filter="art" class="tab-btn px-3.5 py-2 rounded-xl text-xs mono cursor-pointer">
+            🎨 Арт и UI (4)
+          </button>
+          <button type="button" data-filter="sound" class="tab-btn px-3.5 py-2 rounded-xl text-xs mono cursor-pointer">
+            🎧 Звук и Медиа (2+1)
+          </button>
+        </div>
+      </div>
+
+      <!-- Важное правило по совмещению и смене ролей -->
+      <div class="studio-card-soft p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <span class="mono text-xs px-2.5 py-1 rounded lime-badge shrink-0">ВАЖНО</span>
+          <p class="text-xs sm:text-sm font-medium">
+            Ребята с <strong>двойной ролью</strong> (Ульяна Громова и Рамзиль Губеев) участвуют в обоих ТЗ своих отделов. Если за неделю поймёшь, что душа лежит к другому отделу — во вторник после показа MVP спокойно переставим!
+          </p>
+        </div>
+      </div>
+
+      <!-- Сетка карточек участников (генерируется из массива данных) -->
+      <div id="rosterGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- БЛОК 4. ОБЩЕЕ И ОТДЕЛЬНЫЕ ТЗ НА НЕДЕЛЮ (С ЧЕК-ЛИСТОМ) -->
+    <section id="tasks" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+        <div>
+          <div class="mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-accent);">
+            // 03 · Задачи на Спринт #1 (Неделя 1)
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">
+            ТЗ на неделю: твой чек-лист к показу во вторник
+          </h2>
+        </div>
+
+        <!-- Прогресс-бар выполнения личных задач -->
+        <div class="studio-card px-4 py-3 flex items-center gap-4 min-w-[260px]">
+          <div class="flex-1">
+            <div class="flex justify-between text-xs mono font-bold mb-1">
+              <span>Мой прогресс ТЗ</span>
+              <span id="progressLabel">0%</span>
+            </div>
+            <div class="w-full h-2.5 bg-[var(--bg-surface-2)] rounded-full overflow-hidden">
+              <div id="progressBar" class="h-full bg-[#7199F1] transition-all duration-300" style="width: 0%;"></div>
+            </div>
+          </div>
+          <button id="resetTasksBtn" type="button" title="Сбросить галочки" class="mono text-xs px-2 py-1 rounded border border-[var(--border-color)] hover:opacity-75 cursor-pointer">
+            Сброс
+          </button>
+        </div>
+      </div>
+
+      <!-- ОБЩЕЕ ТЗ ДЛЯ КАЖДОГО УЧАСТНИКА -->
+      <div class="studio-card p-6 border-l-4 border-l-[#2149A1] space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="mono text-xs px-2.5 py-1 rounded lime-badge">ОБЯЗАТЕЛЬНО ДЛЯ ВСЕХ 12 УЧАСТНИКОВ</span>
+            <span class="mono text-xs" style="color: var(--text-muted);">Независимо от выбранного отдела</span>
+          </div>
+          <button type="button" data-copy-target="common" class="copy-tz-btn mono text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-color)] bg-[var(--bg-surface-2)] hover:opacity-80 cursor-pointer">
+            📋 Скопировать общее ТЗ
+          </button>
+        </div>
+
+        <h3 class="text-lg sm:text-xl font-extrabold">
+          Базовый квест недели: свой живой MVP + список идей на ревью
+        </h3>
+
+        <div class="space-y-3" id="commonTasksList">
+          <label class="task-row flex items-start gap-3 p-3.5 rounded-xl studio-card-soft cursor-pointer">
+            <input type="checkbox" class="task-checkbox mt-0.5" data-task-id="common-1">
+            <div class="task-text text-sm sm:text-base leading-relaxed">
+              <strong>1. Собрать свой живой, запускающийся прототип (MVP):</strong> открой <strong>Lovable</strong>, <strong>DeepSeek</strong> (там бесплатные токены!), <strong>Gemini</strong>, <strong>Qwen</strong>, <strong>ChatGPT</strong> или <strong>Godot</strong> и собери рабочий макет «Kernel Valley» так, как его видишь ты. Не нужно вмещать сразу все механики мира — главное, чтобы прототип реально запускался в браузере или на ПК и в нём можно было побегать / потыкать кнопки. <em>(Тяжёлые Unreal Engine 5 и проблемный по лицензиям Unity не берём!)</em>
+            </div>
+          </label>
+
+          <label class="task-row flex items-start gap-3 p-3.5 rounded-xl studio-card-soft cursor-pointer">
+            <input type="checkbox" class="task-checkbox mt-0.5" data-task-id="common-2">
+            <div class="task-text text-sm sm:text-base leading-relaxed">
+              <strong>2. Принести «бумажку хотелок» и замечаний ко вторнику:</strong> запиши по пунктам: какие механики из общего списка точно оставляем, какие кажутся лишними и перегружают игру, какую свою безумную приколюху ты хочешь добавить (это за нас нейронка не придумает!) и чем именно ты хочешь заниматься в общем репозитории дальше.
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- ПЕРЕКЛЮЧАЕМЫЕ ВКЛАДКИ ТЗ ПО ОТДЕЛАМ -->
+      <div class="space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2" id="deptTzTabs">
+            <button type="button" data-tz-tab="dev" class="tab-btn active px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold cursor-pointer">
+              💻 ТЗ: Отдел разработки
+            </button>
+            <button type="button" data-tz-tab="gd" class="tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold cursor-pointer">
+              📝 ТЗ: Геймдизайн и нарратив
+            </button>
+            <button type="button" data-tz-tab="art" class="tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold cursor-pointer">
+              🎨 ТЗ: Арт, UI и визуал
+            </button>
+            <button type="button" data-tz-tab="sound" class="tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold cursor-pointer">
+              🎧 ТЗ: Звук, медиа и QA
+            </button>
+          </div>
+
+          <button type="button" id="copyActiveDeptTzBtn" class="mono text-xs font-bold px-4 py-2.5 rounded-xl btn-primary cursor-pointer">
+            📋 Скопировать ТЗ этого отдела
+          </button>
+        </div>
+
+        <!-- Контейнер активного ТЗ отдела -->
+        <div id="deptTzContent" class="studio-card p-6 space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- БЛОК 5. ИНТЕРАКТИВНЫЙ КОНСТРУКТОР ПРОМПТА ДЛЯ MVP -->
+    <section id="prompt-builder" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+        <div>
+          <div class="mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-accent);">
+            // 04 · Помощник сборки прототипа
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">
+            Конструктор промпта для твоего MVP
+          </h2>
+        </div>
+        <div class="mono text-xs px-3 py-1.5 rounded-lg lime-badge">
+          Для DeepSeek · Lovable · Gemini · Qwen
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Левая колонка: настройки промпта -->
+        <div class="lg:col-span-6 studio-card p-6 space-y-5">
+          <div>
+            <div class="text-sm font-extrabold mb-2.5">1. Выбери механики, которые хочешь проверить в своём MVP:</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="promptMechanics">
+              <label class="flex items-center gap-2.5 p-2.5 rounded-lg studio-card-soft text-xs font-semibold cursor-pointer">
+                <input type="checkbox" class="task-checkbox mech-cb" value="поле тайлов 20x15 с посадкой, ростом и сбором урожая кукурузы и экономикой" checked>
+                <span>🌽 Поле 20×15 + кукуруза</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-lg studio-card-soft text-xs font-semibold cursor-pointer">
+                <input type="checkbox" class="task-checkbox mech-cb" value="набеги глючных DDoS-монстров и воров кукурузы с системой здоровья и повреждений" checked>
+                <span>👾 Бой с DDoS-монстрами</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-lg studio-card-soft text-xs font-semibold cursor-pointer">
+                <input type="checkbox" class="task-checkbox mech-cb" value="постройка простых конвейеров и защитных антивирусных турелей-фаерволов">
+                <span>⚙️ Конвейеры и установки</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-lg studio-card-soft text-xs font-semibold cursor-pointer">
+                <input type="checkbox" class="task-checkbox mech-cb" value="мини-холст для рисования, где игрок рисует себе робота-помощника, который оживает на карте">
+                <span>🎨 Холст: нарисуй дрона</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-lg studio-card-soft text-xs font-semibold cursor-pointer">
+                <input type="checkbox" class="task-checkbox mech-cb" value="диалоги с колоритными жителями кибер-деревни и мини-задачи по защите от мошенников">
+                <span>👵 Жители и ИБ-квесты</span>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 rounded-lg studio-card-soft text-xs font-semibold cursor-pointer">
+                <input type="checkbox" class="task-checkbox mech-cb" value="деревенская лавка продуктов для продажи урожая и покупки апгрейдов жилища">
+                <span>🏪 Деревенская лавка</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label for="promptStack" class="block text-sm font-extrabold mb-2">2. В каком формате нейронка должна выдать код?</label>
+            <select id="promptStack" class="w-full p-3 rounded-xl text-xs sm:text-sm font-semibold border border-[var(--border-color)] bg-[var(--bg-page)] text-[var(--text-main)]">
+              <option value="single-html">Один готовый HTML-файл (HTML5 Canvas + JS) — идеально для DeepSeek / Gemini / Qwen</option>
+              <option value="lovable-react">Веб-приложение на React + TypeScript + Tailwind — идеально для Lovable</option>
+              <option value="godot-script">Архитектура сцены и готовый скрипт GDScript для движка Godot 4</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="promptCustom" class="block text-sm font-extrabold mb-2">3. Добавь свою безумную фичу или визуальный стиль:</label>
+            <input type="text" id="promptCustom" placeholder="Например: интерфейс в стиле Liquid Glass и робот-помощник как ВАЛЛ-И..." class="w-full p-3 rounded-xl text-xs sm:text-sm border border-[var(--border-color)] bg-[var(--bg-page)] text-[var(--text-main)]">
+          </div>
+        </div>
+
+        <!-- Правая колонка: готовый промпт для копирования -->
+        <div class="lg:col-span-6 studio-card p-6 flex flex-col justify-between space-y-4">
+          <div class="flex items-center justify-between gap-2">
+            <span class="mono text-xs font-bold uppercase" style="color: var(--text-accent);">
+              Готовый промпт (обновляется автоматически)
+            </span>
+            <span class="mono text-xs px-2 py-0.5 rounded studio-card-soft">Copy & Paste</span>
+          </div>
+
+          <textarea id="generatedPrompt" readonly rows="10" class="w-full p-4 rounded-xl mono text-xs sm:text-sm leading-relaxed border border-[var(--border-color)] bg-[var(--bg-page)] text-[var(--text-main)] resize-none focus:outline-none"></textarea>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs" style="color: var(--text-muted);">
+              Скопируй и вставь в DeepSeek, Lovable или Gemini — через 2 минуты получишь рабочий прототип!
+            </span>
+            <button type="button" id="copyPromptBtn" class="btn-primary px-5 py-3 rounded-xl text-xs sm:text-sm mono cursor-pointer">
+              📋 Скопировать промпт
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- БЛОК 6. ОБЩИЙ ПЛАН И РИТМ РАБОТЫ СТУДИИ -->
+    <section id="roadmap" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+        <div>
+          <div class="mono text-xs font-bold uppercase tracking-widest" style="color: var(--text-accent);">
+            // 05 · Как мы работаем дальше
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">
+            Ритм спринтов и дорожная карта студии
+          </h2>
+        </div>
+        <div class="mono text-xs px-3 py-1.5 rounded-lg studio-card-soft">
+          Релиз сборки — каждый месяц
+        </div>
+      </div>
+
+      <!-- 4 недели текущего спринта -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="studio-card p-5 border-2 border-[#7199F1] relative">
+          <span class="mono text-[11px] px-2.5 py-0.5 rounded lime-badge">МЫ ЗДЕСЬ · НЕДЕЛЯ 1</span>
+          <h3 class="text-lg font-extrabold mt-3">Штурм и личные MVP</h3>
+          <p class="text-xs sm:text-sm mt-2 leading-relaxed" style="color: var(--text-muted);">
+            Каждый собирает свой живой прототип «Kernel Valley» и приносит список идей. Смотрим, у кого какие фичи получились круче всего.
+          </p>
+        </div>
+
+        <div class="studio-card p-5">
+          <span class="mono text-[11px] px-2.5 py-0.5 rounded studio-card-soft">НЕДЕЛЯ 2 · ВТОРНИК</span>
+          <h3 class="text-lg font-extrabold mt-3">Выбор движка и Репозиторий</h3>
+          <p class="text-xs sm:text-sm mt-2 leading-relaxed" style="color: var(--text-muted);">
+            Обсуждаем все MVP, утверждаем единый стек (Godot или Web/TS/React с базой данных), создаём общий репозиторий и разбираем задачи по отделам.
+          </p>
+        </div>
+
+        <div class="studio-card p-5">
+          <span class="mono text-[11px] px-2.5 py-0.5 rounded studio-card-soft">НЕДЕЛЯ 3 · СБОРКА</span>
+          <h3 class="text-lg font-extrabold mt-3">Склейка кода, арта и звука</h3>
+          <p class="text-xs sm:text-sm mt-2 leading-relaxed" style="color: var(--text-muted);">
+            Соединяем код разработчиков, пиксель-арт спрайты, квесты геймдизайнеров и звуки в единый живой билд. Отлавливаем баги.
+          </p>
+        </div>
+
+        <div class="studio-card p-5">
+          <span class="mono text-[11px] px-2.5 py-0.5 rounded lime-badge">НЕДЕЛЯ 4 · РЕЛИЗ</span>
+          <h3 class="text-lg font-extrabold mt-3">Первая Витрина месяца</h3>
+          <p class="text-xs sm:text-sm mt-2 leading-relaxed" style="color: var(--text-muted);">
+            Хвастаемся первой общей рабочей версией игры, аплодируем друг другу и планируем новые фичи (и космическое DLC!) на следующий месяц.
+          </p>
+        </div>
+      </div>
+
+      <!-- Горизонт на учебный год -->
+      <div class="studio-card p-6">
+        <div class="mono text-xs font-bold uppercase mb-4" style="color: var(--text-accent);">
+          Большой маршрут нашей студии на год
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl studio-card-soft">
+            <div class="mono text-xs font-bold" style="color: var(--text-accent);">Ноябрь – Декабрь</div>
+            <div class="text-base font-extrabold mt-1">От AI-MVP к Вертикальному срезу</div>
+            <p class="text-xs mt-1.5 leading-relaxed" style="color: var(--text-muted);">
+              Собираем прототипы, выбираем финальный стек, рисуем оригинальный пиксель-арт и к Новому году выкатываем играбельный билд кибер-деревни.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl studio-card-soft">
+            <div class="mono text-xs font-bold" style="color: var(--text-accent);">Январь – Март</div>
+            <div class="text-base font-extrabold mt-1">Прокачка мира, заводов и боёвки</div>
+            <p class="text-xs mt-1.5 leading-relaxed" style="color: var(--text-muted);">
+              Наполняем мир сюжетными квестами по кибербезу, строим сложные конвейеры, внедряем рисование роботов-помощников и озвучку.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl studio-card-soft">
+            <div class="mono text-xs font-bold" style="color: var(--text-accent);">Апрель – Май</div>
+            <div class="text-base font-extrabold mt-1">Финальный релиз и конференции</div>
+            <p class="text-xs mt-1.5 leading-relaxed" style="color: var(--text-muted);">
+              Полируем игру, снимаем крутой трейлер и выходим с готовым продуктом на студенческие конференции, конкурсы и в свои портфолио.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ФУТЕР В ФИРМЕННОМ СТИЛЕ КОЛЛЕДЖА -->
+  <footer class="border-t border-[var(--border-color)] bg-[var(--bg-surface)] py-6 mt-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-xs mono bg-[#222222] text-[#EFFE74]">
+          ЦК
+        </div>
+        <div class="text-xs font-bold">
+          ЦИФРОВОЙ КОЛЛЕДЖ им. Башира Рамеева · Проектная деятельность: Инди-студия
+        </div>
+      </div>
+      <div class="mono text-xs" style="color: var(--text-muted);">
+        Проект «Kernel Valley: Урожай багов» · Все 12 участников в деле 🚀
+      </div>
+    </div>
+  </footer>
+
+  <!-- СКРИПТ ИНТЕРАКТИВНОСТИ -->
+  <script>
+    "use strict";
+
+    /* 1. ДАННЫЕ УЧАСТНИКОВ СТУДИИ (С УЧЁТОМ ВСЕХ ПЕРЕСТАНОВОК НА ВСТРЕЧЕ) */
+    const MEMBERS = [
+      {
+        id: "golovin",
+        name: "Головин Александр",
+        group: "26-01 (9 кл.)",
+        depts: ["dev"],
+        roleBadge: "Разработка (Dev & AI)",
+        dual: false,
+        focus: "Сборка базового 2D top-down прототипа (Godot или Web), архитектура тайловой карты и проверка механики вживую."
+      },
+      {
+        id: "syrtsev",
+        name: "Сырцев Илья",
+        group: "26-11 (11 кл.)",
+        depts: ["dev"],
+        roleBadge: "Разработка (Экономика и ферма)",
+        dual: false,
+        focus: "Прототип механики фермерства (рост и сбор кукурузы), математика экономики, конвейеров и систем повреждений."
+      },
+      {
+        id: "anisimov",
+        name: "Анисимов Данила",
+        group: "26-01 (9 кл.)",
+        depts: ["dev"],
+        roleBadge: "Разработка (Механики мира)",
+        dual: false,
+        focus: "Сборка своего варианта MVP, программирование перемещения ИБ-андроида и взаимодействия с объектами деревни."
+      },
+      {
+        id: "gromova",
+        name: "Громова Ульяна",
+        group: "26-01 (9 кл.)",
+        depts: ["dev", "art"],
+        roleBadge: "Разработка + Арт и UI",
+        dual: true,
+        focus: "Совмещение двух отделов: сборка рабочего веб/игрового MVP + отрисовка 2D пиксель-арт спрайтов и макета интерфейса."
+      },
+      {
+        id: "yanguchina",
+        name: "Янгучина Алина",
+        group: "26-01 (9 кл.)",
+        depts: ["dev", "sound"],
+        roleBadge: "Разработка (+ Звук по желанию)",
+        dual: false,
+        focus: "Перешла в отдел разработки: сборка MVP с механикой рисования помощников и защитой от мошенников (+ музыкальные идеи по желанию)."
+      },
+      {
+        id: "gubeev",
+        name: "Губеев Рамзиль",
+        group: "26-02 (9 кл.)",
+        depts: ["gd", "art"],
+        roleBadge: "Геймдизайн + Арт и UI",
+        dual: true,
+        focus: "Совмещение двух отделов: проработка сюжета, баланса и механик «Кибер-деревни» + создание 2D пиксель-арта и концептов."
+      },
+      {
+        id: "kuklin",
+        name: "Куклин Александр",
+        group: "26-02 (9 кл.)",
+        depts: ["gd"],
+        roleBadge: "Квест-дизайнер и Нарративщик",
+        dual: false,
+        focus: "Самостоятельная (ручная) проработка 3 стартовых квестов, лора деревни и цепочек задач для ИБ-андроида + свой MVP."
+      },
+      {
+        id: "bariev",
+        name: "Бариев Руслан",
+        group: "26-01 (9 кл.)",
+        depts: ["gd"],
+        roleBadge: "Геймдизайн и Диалоги",
+        dual: false,
+        focus: "Создание колоритных характеров жителей деревни, смешных диалогов, «глупых вопросов» к андроиду и правил механики рисования."
+      },
+      {
+        id: "kontsova",
+        name: "Концова Анастасия",
+        group: "26-02 (9 кл.)",
+        depts: ["art"],
+        roleBadge: "Арт-отдел (2D Pixel-Art & UI)",
+        dual: false,
+        focus: "Создание спрайт-листов главного героя-андроида, роботов-помощников и тайлов кибер-деревни с видом сверху + макет UI."
+      },
+      {
+        id: "sagirov",
+        name: "Сагиров Данир",
+        group: "26-01 (9 кл.)",
+        depts: ["art"],
+        roleBadge: "Арт-отдел (Ассеты и AI-Art)",
+        dual: false,
+        focus: "Генерация и ручная доработка 2D пиксель-арт монстров (DDoS-багов), тайлов кукурузы, конвейеров и интерфейса."
+      },
+      {
+        id: "mosunova",
+        name: "Мосунова Надежда",
+        group: "26-01 (9 кл.)",
+        depts: ["sound"],
+        roleBadge: "Звук, Медиа и QA",
+        dual: false,
+        focus: "Подбор звукового пака для деревни, чек-лист проверки билдов и свой MVP (можно с фичей деревенской лавки продуктов)."
+      },
+      {
+        id: "arkhireev",
+        name: "Архиреев Григорий",
+        group: "26-11 (11 кл.)",
+        depts: ["sound"],
+        roleBadge: "Звук, Медиа и Автоматизация",
+        dual: false,
+        focus: "Подбор инструментов записи/генерации звука и эффектов, тестирование ИИ-прототипа и идей с автоматизацией."
+      }
+    ];
+
+    /* 2. ДАННЫЕ ТЗ ПО ОТДЕЛАМ */
+    const DEPT_TZ = {
+      dev: {
+        title: "💻 ТЗ №1. Отдел разработки (Dev & AI)",
+        members: "Головин Александр, Сырцев Илья, Анисимов Данила, Громова Ульяна (+ Арт), Янгучина Алина",
+        subtitle: "Главный критерий: принести ко вторнику живой, запускающийся прототип и чистый код.",
+        tasks: [
+          {
+            id: "dev-1",
+            text: "Собрать запускающийся 2D top-down прототип (например, поле тайлов 20×15), где ИБ-андроид перемещается по карте и взаимодействует с окружением."
+          },
+          {
+            id: "dev-2",
+            text: "Реализовать на выбор 1–2 рабочие механики: выращивание/сбор кукурузы и экономика (фокус для Ильи), сражение с DDoS-монстрами и полоска ХП, конвейер или окно рисования помощника (фокус для Алины)."
+          },
+          {
+            id: "dev-3",
+            text: "Причесать и оптимизировать код: если генерируешь в Lovable / DeepSeek / Gemini — разобраться, как устроен код, и убрать явные косяки генерации."
+          },
+          {
+            id: "dev-4",
+            text: "Сформулировать аргументы ко вторнику: на каком едином стеке собираем общий проект дальше — Godot 4 или веб-стек (TypeScript / React с сохранением прогресса в БД по логину)."
+          }
+        ]
+      },
+      gd: {
+        title: "📝 ТЗ №2. Отдел геймдизайна и нарратива (GD & Narrative)",
+        members: "Губеев Рамзиль (+ Арт), Куклин Александр, Бариев Руслан",
+        subtitle: "Главный критерий: расширить вселенную игры, придумать крутые квесты и правила механик.",
+        tasks: [
+          {
+            id: "gd-1",
+            text: "Расширить сюжетную завязку «Kernel Valley»: кто такой наш ИБ-андроид, почему его сослали в кибер-деревню и как компьютерные баги и мошенники выглядят в реальности."
+          },
+          {
+            id: "gd-2",
+            text: "Прописать 3–4 харизматичных жителей деревни (NPC): их характеры, диалоги и те самые смешные «глупые вопросы», которые они задают ИБ-специалисту."
+          },
+          {
+            id: "gd-3",
+            text: "Детально расписать 3 стартовых квеста (например: спасти урожай кукурузы от воров-эксплойтов, построить первый конвейер-фаервол, вычислить телефонного мошенника). Можно писать полностью вручную без ИИ!"
+          },
+          {
+            id: "gd-4",
+            text: "Продумать правила фичи «Нарисуй себе помощника»: как нарисованный игроком скетч превращается в дрона (в духе ВАЛЛ-И) и чем именно он помогает на ферме."
+          }
+        ]
+      },
+      art: {
+        title: "🎨 ТЗ №3. Арт-отдел, UI и визуал (Art & Design)",
+        members: "Концова Анастасия, Сагиров Данир, Громова Ульяна (совм. с Dev), Губеев Рамзиль (совм. с GD)",
+        subtitle: "Главный критерий: задать стильный 2D пиксель-арт вид сверху и показать первые спрайты.",
+        tasks: [
+          {
+            id: "art-1",
+            text: "Нарисовать (вручную в Krita/Aseprite или через ИИ с доработкой) спрайт или спрайт-лист главного героя — советского ИБ-андроида (вид сверху) и маленького робота-помощника (в духе ВАЛЛ-И)."
+          },
+          {
+            id: "art-2",
+            text: "Подготовить концепты 1–2 врагов: глючного кибер-монстра (DDoS-монстра) и похитителя кукурузы."
+          },
+          {
+            id: "art-3",
+            text: "Собрать базовый набор тайлов 2D top-down: грядка с кукурузой, секция конвейера/установки и деревенский кибер-домик."
+          },
+          {
+            id: "art-4",
+            text: "Набросать макет игрового интерфейса (полоска повреждений, инвентарь, окно для рисования помощника) — можно примерить тёмную тему и стиль Liquid Glass со штурма!"
+          }
+        ]
+      },
+      sound: {
+        title: "🎧 ТЗ №4. Отдел звука, медиа и QA (Sound, Media & QA)",
+        members: "Мосунова Надежда, Архиреев Григорий (+ музыкальные идеи от Янгучиной Алины)",
+        subtitle: "Главный критерий: подобрать звуковую атмосферу кибер-деревни и критерии проверки MVP.",
+        tasks: [
+          {
+            id: "sound-1",
+            text: "Определиться с инструментами и источниками: в каких программах и из каких бесплатных библиотек будем брать, записывать или генерировать звук."
+          },
+          {
+            id: "sound-2",
+            text: "Собрать референс-пак из 5–7 аудиофайлов: фоновая ретро/8-бит тема кибер-деревни, шаги андроида, сбор кукурузы, тревога при атаке вируса и гул конвейера."
+          },
+          {
+            id: "sound-3",
+            text: "Собрать свой вариант MVP в нейросети с акцентом на близкие вам фичи (например, Надежда — с деревенской лавкой продуктов, Григорий — с автоматизацией)."
+          },
+          {
+            id: "sound-4",
+            text: "Подготовить короткий чек-лист QA на вторник: по каким пунктам проверяем прототипы ребят (запускаемость, отсутствие зависаний, понятность управления)."
+          }
+        ]
+      }
+    };
+
+    /* 3. ОПИСАНИЯ ТАЙЛОВ ИНТЕРАКТИВНОЙ КАРТЫ */
+    const TILE_DESCRIPTIONS = {
+      hero: "[🤖 ИБ-Андроид]: Главный герой с видом сверху. Ходит по тайлам, чинит баги, отбивает атаки мошенников и следит за урожаем.",
+      corn: "[🌽 Поле кукурузы]: Главная культура кибер-деревни. Даёт ресурсы для апгрейдов, но её постоянно пытаются украсть вредоносные скрипты!",
+      ddos: "[👾 DDoS-Монстр]: Оживший сетевой баг. Атакует серверные грядки и жителей — против него нужны конвейеры-фаерволы и антивирусный меч.",
+      factory: "[⚙️ Конвейер-Завод]: Привет, Factorio! Автоматизирует сбор кукурузы и производство защитных патчей.",
+      walle: "[🎨 Нарисованный Дрон]: Помощник в духе ВАЛЛ-И, которого игрок собственноручно нарисовал прямо внутри игры!",
+      npc: "[👵 Житель Кибер-деревни]: Задаёт жизненные и глупые вопросы, просит защитить от телефонных мошенников и выдаёт квесты.",
+      shop: "[🏪 Сельпо-Лавка]: Местный магазин домашних продуктов на окраине сети — здесь продаём урожай и покупаем детали.",
+      house: "[🏠 Жилище Андроида]: База главного героя, которую можно прокачивать и обустраивать по мере спасения деревни."
+    };
+
+    /* СОСТОЯНИЕ ПРИЛОЖЕНИЯ */
+    let activeRosterFilter = "all";
+    let activeTzTab = "dev";
+    let selectedMemberId = "";
+    const STORAGE_KEY = "kv_studio_tasks_v1";
+    let completedTasks = {};
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) completedTasks = JSON.parse(saved) || {};
+    } catch (e) {
+      completedTasks = {};
+    }
+
+    /* УТИЛИТА: ПОКАЗ УВЕДОМЛЕНИЯ (TOAST) И КОПИРОВАНИЕ В БУФЕР */
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      const toastText = document.getElementById("toastText");
+      toastText.textContent = msg;
+      toast.classList.remove("hidden");
+      toast.classList.add("flex");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        toast.classList.add("hidden");
+        toast.classList.remove("flex");
+      }, 2600);
+    }
+
+    function copyTextToClipboard(text, successMsg) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        showToast(successMsg || "Скопировано в буфер обмена!");
+      } catch (err) {
+        showToast("Не удалось скопировать автоматически");
+      }
+      document.body.removeChild(ta);
+    }
+
+    /* 4. РЕНДЕР СЕЛЕКТОРА УЧАСТНИКОВ И КАРТОЧЕК КОМАНДЫ */
+    function initMemberSelect() {
+      const sel = document.getElementById("memberSelect");
+      MEMBERS.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m.id;
+        opt.textContent = `${m.name} — ${m.roleBadge}`;
+        sel.appendChild(opt);
+      });
+
+      sel.addEventListener("change", () => {
+        selectedMemberId = sel.value;
+        updatePersonalBanner();
+        renderRoster();
+        if (selectedMemberId) {
+          const member = MEMBERS.find(x => x.id === selectedMemberId);
+          if (member && member.depts.length) {
+            setActiveTzTab(member.depts[0]);
+          }
+        }
+      });
+    }
+
+    function updatePersonalBanner() {
+      const card = document.getElementById("personalCard");
+      const empty = document.getElementById("personalEmpty");
+      if (!selectedMemberId) {
+        card.classList.add("hidden");
+        empty.classList.remove("hidden");
+        return;
+      }
+      const m = MEMBERS.find(x => x.id === selectedMemberId);
+      if (!m) return;
+
+      empty.classList.add("hidden");
+      card.classList.remove("hidden");
+      document.getElementById("pName").textContent = m.name;
+      document.getElementById("pGroup").textContent = `Группа: ${m.group}`;
+      document.getElementById("pFocus").textContent = m.focus;
+
+      const badgesBox = document.getElementById("pBadges");
+      badgesBox.innerHTML = "";
+      const b = document.createElement("span");
+      b.className = "mono text-xs px-2.5 py-1 rounded lime-badge";
+      b.textContent = m.roleBadge;
+      badgesBox.appendChild(b);
+
+      const dualWarn = document.getElementById("pDualWarning");
+      if (m.dual) {
+        dualWarn.classList.remove("hidden");
+      } else {
+        dualWarn.classList.add("hidden");
+      }
+    }
+
+    function renderRoster() {
+      const grid = document.getElementById("rosterGrid");
+      grid.innerHTML = "";
+
+      const filtered = MEMBERS.filter(m => {
+        if (activeRosterFilter === "all") return true;
+        return m.depts.includes(activeRosterFilter);
+      });
+
+      filtered.forEach(m => {
+        const isSelected = m.id === selectedMemberId;
+        const card = document.createElement("div");
+        card.className = `studio-card member-card p-5 flex flex-col justify-between gap-3 cursor-pointer ${isSelected ? "highlighted" : ""}`;
+        card.onclick = () => {
+          const sel = document.getElementById("memberSelect");
+          sel.value = m.id;
+          selectedMemberId = m.id;
+          updatePersonalBanner();
+          renderRoster();
+          if (m.depts.length) setActiveTzTab(m.depts[0]);
+        };
+
+        const deptLabels = m.depts.map(d => {
+          if (d === "dev") return "💻 Dev";
+          if (d === "gd") return "📝 GD";
+          if (d === "art") return "🎨 Art";
+          if (d === "sound") return "🎧 Sound/QA";
+          return d;
+        }).join(" + ");
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h3 class="text-base font-extrabold">${m.name}</h3>
+                <div class="mono text-xs mt-0.5" style="color: var(--text-muted);">${m.group}</div>
+              </div>
+              <span class="mono text-xs px-2.5 py-1 rounded ${m.dual ? "lime-badge" : "studio-card-soft font-bold"}">
+                ${deptLabels}
+              </span>
+            </div>
+            <div class="mt-3 text-xs font-bold" style="color: var(--text-accent);">
+              ${m.roleBadge}
+            </div>
+            <p class="mt-1.5 text-xs leading-relaxed" style="color: var(--text-muted);">
+              ${m.focus}
+            </p>
+          </div>
+          <div class="pt-2 border-t border-[var(--border-color)] flex items-center justify-between text-[11px] mono" style="color: var(--text-muted);">
+            <span>${m.dual ? "⚡ Двойное ТЗ (2 отдела)" : "✓ Основной состав"}</span>
+            <span class="font-bold" style="color: var(--text-accent);">Открыть ТЗ →</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* 5. РЕНДЕР ВКЛАДОК ТЗ И ЧЕК-ЛИСТОВ С СОХРАНЕНИЕМ ПРОГРЕССА */
+    function setActiveTzTab(tabKey) {
+      activeTzTab = tabKey;
+      document.querySelectorAll("#deptTzTabs .tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tzTab === tabKey);
+      });
+      renderDeptTzContent();
+    }
+
+    function renderDeptTzContent() {
+      const box = document.getElementById("deptTzContent");
+      const data = DEPT_TZ[activeTzTab];
+      if (!data) return;
+
+      const tasksHtml = data.tasks.map((t, idx) => {
+        const checked = !!completedTasks[t.id];
+        return `
+          <label class="task-row ${checked ? "done" : ""} flex items-start gap-3 p-3.5 rounded-xl studio-card-soft cursor-pointer">
+            <input type="checkbox" class="task-checkbox dept-task-cb mt-0.5" data-task-id="${t.id}" ${checked ? "checked" : ""}>
+            <div class="task-text text-sm sm:text-base leading-relaxed">
+              <strong>Задача ${idx + 1}:</strong> ${t.text}
+            </div>
+          </label>
+        `;
+      }).join("");
+
+      box.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--border-color)] pb-3">
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold">${data.title}</h3>
+            <p class="text-xs sm:text-sm mt-1" style="color: var(--text-muted);">${data.subtitle}</p>
+          </div>
+          <span class="mono text-xs px-3 py-1 rounded lime-badge shrink-0">4 пункта к проверке</span>
+        </div>
+        <div class="text-xs mono p-3 rounded-lg bg-[var(--bg-page)] border border-[var(--border-color)]">
+          <strong>Состав отдела:</strong> ${data.members}
+        </div>
+        <div class="space-y-2.5">
+          ${tasksHtml}
+        </div>
+      `;
+
+      box.querySelectorAll(".dept-task-cb").forEach(cb => {
+        cb.addEventListener("change", onTaskCheckChange);
+      });
+    }
+
+    function onTaskCheckChange(e) {
+      const cb = e.target;
+      const id = cb.dataset.taskId;
+      completedTasks[id] = cb.checked;
+      const row = cb.closest(".task-row");
+      if (row) row.classList.toggle("done", cb.checked);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(completedTasks));
+      } catch (err) {}
+      updateProgressBar();
+    }
+
+    function syncCommonTasksCheckboxes() {
+      document.querySelectorAll("#commonTasksList .task-checkbox").forEach(cb => {
+        const id = cb.dataset.taskId;
+        cb.checked = !!completedTasks[id];
+        const row = cb.closest(".task-row");
+        if (row) row.classList.toggle("done", cb.checked);
+        cb.addEventListener("change", onTaskCheckChange);
+      });
+    }
+
+    function updateProgressBar() {
+      // Считаем прогресс по 2 общим задачам + 4 задачам текущего открытого отдела (всего 6 пунктов)
+      const activeIds = ["common-1", "common-2", ...DEPT_TZ[activeTzTab].tasks.map(t => t.id)];
+      const doneCount = activeIds.filter(id => !!completedTasks[id]).length;
+      const pct = Math.round((doneCount / activeIds.length) * 100);
+      document.getElementById("progressLabel").textContent = `${doneCount}/${activeIds.length} (${pct}%)`;
+      document.getElementById("progressBar").style.width = `${pct}%`;
+    }
+
+    /* 6. КОНСТРУКТОР ПРОМПТА ДЛЯ НЕЙРОСЕТИ */
+    function updateGeneratedPrompt() {
+      const checkedMechs = [...document.querySelectorAll(".mech-cb:checked")].map(cb => cb.value);
+      const stack = document.getElementById("promptStack").value;
+      const custom = document.getElementById("promptCustom").value.trim();
+
+      let stackInstruction = "";
+      if (stack === "single-html") {
+        stackInstruction = "Реализуй рабочий интерактивный прототип (MVP) в ОДНОМ самодостаточном файле index.html (используй HTML5 Canvas или DOM-сетку + чистый JavaScript и CSS), чтобы он сразу запускался в браузере двойным кликом.";
+      } else if (stack === "lovable-react") {
+        stackInstruction = "Создай современное интерактивное веб-приложение (MVP игры) на React + TypeScript + Tailwind CSS с чистой компонентной архитектурой и мгновенным откликом интерфейса.";
+      } else {
+        stackInstruction = "Напиши структуру узлов сцены (Node2D / TileMap / CharacterBody2D) и полный готовый скрипт на GDScript для движка Godot 4, чтобы прототип можно было сразу запустить.";
+      }
+
+      const mechList = checkedMechs.length
+        ? checkedMechs.map((m, i) => `${i + 1}) ${m};`).join("\n")
+        : "1) Перемещение ИБ-андроида по тайловой сетке 20x15 и базовое взаимодействие с окружением;";
+
+      const customLine = custom
+        ? `\nДополнительная авторская фича и стиль: ${custom}.`
+        : "";
+
+      const promptText = `Привет! Мы в студенческой инди-студии разрабатываем 2D Pixel-Art Top-Down RPG / симулятор «Kernel Valley: Урожай багов» (референсы: Stardew Valley + Factorio + кибербезопасность).
+
+Сеттинг: Списанный советский ИБ-андроид (робот-антивирус) отправлен в захолустную кибер-деревню на окраине сети, где компьютерные баги, уязвимости, телефонные мошенники и кривые скрипты обрели физическую форму.
+
+Включи в этот рабочий прототип следующие механики:
+${mechList}${customLine}
+
+Техническое требование:
+${stackInstruction}
+Добавь наглядное управление (WASD / стрелки + мышь), счётчик ресурсов/урожая, индикатор здоровья андроида и приятный визуал в ретро/кибер-стиле.`;
+
+      document.getElementById("generatedPrompt").value = promptText;
+    }
+
+    /* 7. ИНИЦИАЛИЗАЦИЯ ВСЕХ ОБРАБОТЧИКОВ */
+    document.addEventListener("DOMContentLoaded", () => {
+      initMemberSelect();
+      renderRoster();
+      syncCommonTasksCheckboxes();
+      renderDeptTzContent();
+      updateProgressBar();
+      updateGeneratedPrompt();
+
+      // Переключение фильтров списка команды
+      document.querySelectorAll("#rosterTabs .tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeRosterFilter = btn.dataset.filter;
+          document.querySelectorAll("#rosterTabs .tab-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          renderRoster();
+        });
+      });
+
+      // Переключение вкладок ТЗ отделов
+      document.querySelectorAll("#deptTzTabs .tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          setActiveTzTab(btn.dataset.tzTab);
+          updateProgressBar();
+        });
+      });
+
+      // Клик по тайлам интерактивной сцены
+      document.querySelectorAll("#InteractiveMap button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const key = btn.dataset.tile;
+          document.getElementById("tileInfoBox").innerHTML = TILE_DESCRIPTIONS[key] || "";
+          document.querySelectorAll("#InteractiveMap button").forEach(b => {
+            b.classList.remove("border-2", "border-[#2149A1]");
+            b.classList.add("border", "border-[var(--border-color)]");
+          });
+          btn.classList.remove("border", "border-[var(--border-color)]");
+          btn.classList.add("border-2", "border-[#2149A1]");
+        });
+      });
+
+      // Копирование общего ТЗ
+      document.querySelector('[data-copy-target="common"]').addEventListener("click", () => {
+        const text = `ОБЩЕЕ ТЗ ИНДИ-СТУДИИ (ко вторнику):\n1. Собрать свой живой запускающийся прототип (MVP) «Kernel Valley: Урожай багов» в Lovable / DeepSeek / Gemini / Qwen / Godot.\n2. Подготовить список своих идей и замечаний: какие механики оставляем, какие убираем, какую свою безумную фичу добавляем.`;
+        copyTextToClipboard(text, "Общее ТЗ скопировано!");
+      });
+
+      // Копирование ТЗ активного отдела
+      document.getElementById("copyActiveDeptTzBtn").addEventListener("click", () => {
+        const d = DEPT_TZ[activeTzTab];
+        const lines = d.tasks.map((t, i) => `${i + 1}. ${t.text}`).join("\n");
+        const fullText = `${d.title}\nУчастники: ${d.members}\n\nЗадачи на неделю:\n${lines}`;
+        copyTextToClipboard(fullText, `Скопировано: ${d.title}`);
+      });
+
+      // Сброс чекбоксов прогресса
+      document.getElementById("resetTasksBtn").addEventListener("click", () => {
+        completedTasks = {};
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        syncCommonTasksCheckboxes();
+        renderDeptTzContent();
+        updateProgressBar();
+        showToast("Чек-лист сброшен");
+      });
+
+      // Слушатели конструктора промптов
+      document.querySelectorAll(".mech-cb").forEach(cb => cb.addEventListener("change", updateGeneratedPrompt));
+      document.getElementById("promptStack").addEventListener("change", updateGeneratedPrompt);
+      document.getElementById("promptCustom").addEventListener("input", updateGeneratedPrompt);
+
+      document.getElementById("copyPromptBtn").addEventListener("click", () => {
+        const val = document.getElementById("generatedPrompt").value;
+        copyTextToClipboard(val, "Готовый промпт для MVP скопирован!");
+      });
+
+      // Переключатель темы: Светлая (Бренд) <-> Тёмная (Liquid Glass)
+      document.getElementById("themeToggle").addEventListener("click", () => {
+        const html = document.documentElement;
+        const isDark = html.getAttribute("data-theme") === "dark";
+        const nextTheme = isDark ? "light" : "dark";
+        html.setAttribute("data-theme", nextTheme);
+        document.getElementById("themeIcon").textContent = nextTheme === "dark" ? "☀️" : "🌙";
+        document.getElementById("themeLabel").textContent = nextTheme === "dark" ? "Светлая (Бренд)" : "Liquid Glass (Тёмная)";
+      });
+    });
+  </script>
+</body>
+</html>
