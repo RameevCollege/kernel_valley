@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Проверка экрана загрузки</title><link rel="stylesheet" href="loader.css"></head>
+<body><script src="loader.js"></script><script>
+// Integration preview, not the main game. No artificial loading timer.
+const loader = createGameLoader(document.body);
+loader.update(.5, 'Проверяем загрузку встроенных светоциклов…');
+const iframe = document.querySelector('iframe');
+iframe.addEventListener('load', () => loader.ready(() => {
+  const message = document.createElement('p');
+  message.style.padding = '32px';
+  message.textContent = 'Экран загрузки закрыт, светоциклы остановлены. Это проверка интеграции; основная игра ещё не собрана.';
+  document.body.append(message);
+}));
+</script></body></html>

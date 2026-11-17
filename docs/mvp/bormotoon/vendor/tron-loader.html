@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TRON Loader — гонки на светоциклах</title>
+<style>
+  :root{
+    --cyan:#22e6ff;
+    --orange:#ff9d2e;
+    --bg:#04070d;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);}
+  body{
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--cyan);
+    -webkit-user-select:none;user-select:none;touch-action:none;
+  }
+  #wrap{position:fixed;inset:0}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+  /* ==== CRT эффекты ==== */
+  #scanlines{
+    position:absolute;inset:0;pointer-events:none;z-index:5;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,.28) 0px, rgba(0,0,0,.28) 1px,
+      rgba(0,0,0,0) 2px, rgba(0,0,0,0) 4px
+    );
+    mix-blend-mode:multiply;opacity:.55;
+  }
+  #crt{
+    position:absolute;inset:0;pointer-events:none;z-index:6;
+    background:
+      radial-gradient(ellipse at center, rgba(34,230,255,.05) 0%, rgba(0,0,0,0) 55%, rgba(0,0,0,.65) 100%);
+    animation:flicker 3.4s infinite steps(60);
+  }
+  #sweep{
+    position:absolute;left:0;right:0;height:140px;pointer-events:none;z-index:7;
+    background:linear-gradient(to bottom, rgba(34,230,255,0), rgba(34,230,255,.055), rgba(34,230,255,0));
+    animation:sweep 7s linear infinite;
+  }
+  @keyframes flicker{
+    0%,100%{opacity:1}
+    8%{opacity:.93}
+    9%{opacity:1}
+    31%{opacity:.88}
+    32%{opacity:1}
+    62%{opacity:.95}
+    63%{opacity:1}
+    78%{opacity:.9}
+    79%{opacity:1}
+  }
+  @keyframes sweep{
+    0%{transform:translateY(-160px)}
+    100%{transform:translateY(100vh)}
+  }
+
+  #hud{
+    position:absolute;top:0;left:0;right:0;padding:14px 20px;z-index:8;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    text-shadow:0 0 12px rgba(34,230,255,.7);pointer-events:none;
+  }
+  #hud .mid{color:#ffd23f;text-shadow:0 0 12px rgba(255,210,63,.7)}
+  #hud .right{color:var(--orange);text-shadow:0 0 12px rgba(255,157,46,.7)}
+
+  #bar{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
+    border:2px solid var(--cyan);border-radius:6px;
+    box-shadow:0 0 24px rgba(34,230,255,.55),inset 0 0 18px rgba(34,230,255,.25);
+    background:rgba(4,12,20,.85);overflow:hidden;pointer-events:none;
+    animation:neon 2.6s ease-in-out infinite;
+  }
+  @keyframes neon{
+    0%,100%{box-shadow:0 0 24px rgba(34,230,255,.55),inset 0 0 18px rgba(34,230,255,.25)}
+    50%{box-shadow:0 0 38px rgba(34,230,255,.9),inset 0 0 26px rgba(34,230,255,.4)}
+  }
+  #fill{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,rgba(34,230,255,.35),var(--cyan));
+    box-shadow:0 0 26px rgba(34,230,255,.9);
+    transition:width .18s linear;
+  }
+  /* проценты внутри прогресс-бара */
+  #pct{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
+    font-size:15px;font-weight:800;letter-spacing:.24em;
+    color:#eafeff;pointer-events:none;white-space:nowrap;
+    text-shadow:
+      0 0 2px #04070d, 0 0 4px #04070d, 1px 1px 0 #04070d, -1px -1px 0 #04070d,
+      0 0 16px rgba(34,230,255,.9);
+  }
+
+  #label{
+    position:absolute;left:50%;transform:translateX(-50%);z-index:4;
+    font-size:11px;letter-spacing:.34em;text-transform:uppercase;opacity:.8;
+    pointer-events:none;
+  }
+
+  #overlay{
+    position:absolute;inset:0;display:flex;flex-direction:column;z-index:9;
+    align-items:center;justify-content:center;gap:14px;
+    background:rgba(4,7,13,.78);backdrop-filter:blur(3px);text-align:center;padding:24px;
+  }
+  #overlay.hidden{display:none}
+  #overlay h1{
+    margin:0;font-size:clamp(26px,6vw,54px);letter-spacing:.34em;font-weight:800;
+    text-shadow:0 0 30px rgba(34,230,255,.85);
+  }
+  #overlay p{margin:0;font-size:13px;letter-spacing:.16em;line-height:2;opacity:.85;max-width:34em}
+  #overlay .warn{color:var(--orange);text-shadow:0 0 18px rgba(255,157,46,.7)}
+  button{
+    margin-top:10px;background:transparent;border:2px solid var(--cyan);color:var(--cyan);
+    padding:12px 30px;font:inherit;font-size:12px;letter-spacing:.28em;text-transform:uppercase;
+    border-radius:4px;cursor:pointer;box-shadow:0 0 20px rgba(34,230,255,.4);
+  }
+  button:hover{background:rgba(34,230,255,.14)}
+</style>
+<style>
+@media (prefers-reduced-motion: reduce){#crt,#sweep,#scanlines{display:none!important}*{animation:none!important}}
+@media(max-width:600px){#overlay h1{font-size:48px}#overlay p{font-size:13px;padding:0 16px}#hud{font-size:11px}}
+</style></head>
+<body>
+<div id="wrap">
+  <canvas id="cv"></canvas>
+
+  <div id="hud">
+    <div>Счёт · <span id="score">0</span> &nbsp;·&nbsp; Рекорд · <span id="best">0</span></div>
+    <div class="mid">Уровень · <span id="lvl">1</span> · скорость <span id="spd">100</span>% · <span id="dist">0</span> м</div>
+    <div class="right">Программы в сетке · <span id="ai">3</span></div>
+  </div>
+
+  <div id="bar"><div id="fill"></div><div id="pct">0%</div></div>
+  <div id="label">Загрузка системы</div>
+
+
+  <div id="scanlines"></div>
+  <div id="crt"></div>
+  <div id="sweep"></div>
+
+  <div id="overlay">
+    <h1>TRON</h1>
+    <p>
+      Гонка на светоциклах вокруг прогресс-бара против программ.<br>
+      ← и → поворачивают на 90°. ПРОБЕЛ — пауза.<br>
+      Каждые 20% загрузки: +1 оппонент и +15% скорости.<br>
+      Не задень стены, след и прогресс-бар. Езжай, пока можешь.
+    </p>
+    <button id="start">Заехать в сетку</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var barEl = document.getElementById('bar');
+  var fillEl = document.getElementById('fill');
+  var pctEl = document.getElementById('pct');
+  var labelEl = document.getElementById('label');
+  var overlay = document.getElementById('overlay');
+  var startBtn = document.getElementById('start');
+  var scoreEl = document.getElementById('score');
+  var bestEl = document.getElementById('best');
+  var distEl = document.getElementById('dist');
+  var aiEl = document.getElementById('ai');
+  var lvlEl = document.getElementById('lvl');
+  var spdEl = document.getElementById('spd');
+
+  var score = 0, best = 0, kills = 0;
+  function loadBest(){
+    try { best = parseInt(localStorage.getItem('tronBest') || '0', 10) || 0; } catch(e){ best = 0; }
+    bestEl.textContent = best;
+  }
+  function saveBest(){
+    if (score > best){
+      best = score;
+      try { localStorage.setItem('tronBest', String(best)); } catch(e){}
+    }
+    bestEl.textContent = best;
+  }
+  loadBest();
+
+
+  var W = 0, H = 0, DPR = 1;
+  var WALL = 14;              // отступ от краёв окна
+  var bar = {x:0,y:0,w:0,h:0};
+  var BASE_SPEED = 2.6;
+  var SPEED = BASE_SPEED;
+  var TRAIL_GAP = 10;         // неуязвимый хвост рядом с байком
+
+  var state = 'menu';         // menu | run | pause | over
+  var progress = 0, loadDur = 60000, tStart = 0, tPause = 0, raf = 0;
+  // Embedded mode: real parent loading progress, independent of races and pause.
+  var embedded = window.parent !== window;
+  var ownerOrigin = location.origin;
+  if (location.protocol === 'about:' && document.referrer) ownerOrigin = new URL(document.referrer).origin;
+  var externalProgress = 0;
+  function renderProgress(){
+    var pc = Math.round(progress * 100);
+    fillEl.style.width = pc + '%';
+    pctEl.textContent = pc + '%';
+    labelEl.textContent = progress >= 1 ? 'Игра готова · можно переходить' : 'Подготовка игры';
+  }
+  window.addEventListener('message', function(event){
+    if (!embedded || event.source !== window.parent) return;
+    if (ownerOrigin !== 'null' && event.origin !== ownerOrigin) return;
+    var data = event.data;
+    if (!data || data.type !== 'game-loading-progress' || !Number.isFinite(data.value)) return;
+    externalProgress = Math.max(externalProgress, Math.max(0, Math.min(1, data.value)));
+    progress = externalProgress;
+    renderProgress();
+  });
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden && state === 'run') pause();
+  });
+
+  var level = 0;              // 0..5, растёт каждые 20%
+  var riders = [];
+  var parts = [];             // игровые частицы
+  var bg = [];                // фоновые частицы
+  var shake = 0, tick = 0;
+
+  var AI_COLORS = ['#ff9d2e','#ffd23f','#ff5f6d','#b06bff','#5cff9d','#ff42e0','#7bd0ff'];
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * DPR; cv.height = H * DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+
+    var bw = Math.min(Math.max(W * 0.42, 120), 620, Math.max(100, W - 140));
+    var bh = 34;
+    barEl.style.width = bw + 'px';
+    barEl.style.height = bh + 'px';
+    labelEl.style.top = (H/2 + bh/2 + 18) + 'px';
+    bar = { x:(W-bw)/2, y:(H-bh)/2, w:bw, h:bh };
+
+
+    bg = [];
+    var n = Math.round((W*H)/26000);
+    for (var i=0;i<n;i++){
+      bg.push({
+        x: Math.random()*W, y: Math.random()*H,
+        vy: -(0.08 + Math.random()*0.35),
+        r: 0.6 + Math.random()*1.6,
+        a: 0.12 + Math.random()*0.4,
+        ph: Math.random()*Math.PI*2
+      });
+    }
+  }
+
+  function Rider(x,y,dir,color,human){
+    return {x:x,y:y,dir:dir,color:color,human:human,alive:true,dist:0,trail:[{x:x,y:y}],turn:0};
+  }
+  var DIRS = [{x:1,y:0},{x:0,y:1},{x:-1,y:0},{x:0,y:-1}]; // 0=E 1=S 2=W 3=N
+
+  /* ================= частицы ================= */
+  function spark(x,y,color,count,power){
+    for (var i=0;i<count;i++){
+      var a = Math.random()*Math.PI*2, s = (0.4 + Math.random())*power;
+      parts.push({
+        x:x, y:y, vx:Math.cos(a)*s, vy:Math.sin(a)*s,
+        life:1, decay:0.02 + Math.random()*0.04, color:color, r: 1 + Math.random()*2
+      });
+    }
+  }
+  function explode(x,y,color){
+    spark(x,y,color,46,4.6);
+    spark(x,y,'#ffffff',18,2.6);
+    parts.push({x:x,y:y,ring:true,r:4,life:1,decay:0.035,color:color});
+    parts.push({x:x,y:y,ring:true,r:4,life:1,decay:0.06,color:'#ffffff'});
+    shake = Math.min(14, shake + 10);
+  }
+  function stepParts(){
+    for (var i=parts.length-1;i>=0;i--){
+      var p = parts[i];
+      p.life -= p.decay;
+      if (p.ring) { p.r += 5.5; }
+      else { p.x += p.vx; p.y += p.vy; p.vx *= 0.94; p.vy *= 0.94; }
+      if (p.life <= 0) parts.splice(i,1);
+    }
+    if (parts.length > 900) parts.splice(0, parts.length - 900);
+  }
+  function drawParts(){
+    for (var i=0;i<parts.length;i++){
+      var p = parts[i];
+      ctx.globalAlpha = Math.max(0, p.life);
+      if (p.ring){
+        ctx.strokeStyle = p.color; ctx.lineWidth = 2;
+        ctx.shadowBlur = 22; ctx.shadowColor = p.color;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.stroke();
+      } else {
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 14; ctx.shadowColor = p.color;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+  }
+  function stepBg(){
+    for (var i=0;i<bg.length;i++){
+      var b = bg[i];
+      b.y += b.vy;
+      if (b.y < 0) { b.y = H; b.x = Math.random()*W; }
+    }
+  }
+  function drawBg(){
+    for (var i=0;i<bg.length;i++){
+      var b = bg[i];
+      var tw = 0.6 + 0.4*Math.sin(tick*0.05 + b.ph);
+      ctx.globalAlpha = b.a * tw;
+      ctx.fillStyle = '#22e6ff';
+      ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(34,230,255,.8)';
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+  }
+
+  /* ================= игроки ================= */
+  function spawnPos(){
+    var cx = bar.x + bar.w/2, cy = bar.y + bar.h/2;
+    var gap = 46;
+    var cands = [
+      [cx - bar.w/2 - gap, cy + bar.h/2 + gap, 3],
+      [cx + bar.w/2 + gap, cy - bar.h/2 - gap, 1],
+      [cx - bar.w/2 - gap, cy - bar.h/2 - gap, 3],
+      [cx + bar.w/2 + gap, cy + bar.h/2 + gap, 1],
+      [cx, cy - bar.h/2 - gap*1.8, 0],
+      [cx, cy + bar.h/2 + gap*1.8, 2],
+      [cx - bar.w/2 - gap*2.2, cy, 3],
+      [cx + bar.w/2 + gap*2.2, cy, 1]
+    ];
+    for (var k=0;k<40;k++){
+      var c = cands[Math.floor(Math.random()*cands.length)];
+      var jx = (Math.random()-0.5)*40, jy = (Math.random()-0.5)*40;
+      var x = c[0]+jx, y = c[1]+jy;
+      if (!blocked(x,y,null) && !hitsWall(x,y)) return {x:x,y:y,dir:c[2]};
+    }
+    return {x:cands[0][0], y:cands[0][1], dir:cands[0][2]};
+  }
+
+  function addOpponent(){
+    var p = spawnPos();
+    var color = AI_COLORS[(riders.length - 1) % AI_COLORS.length];
+    riders.push(Rider(p.x, p.y, p.dir, color, false));
+    spark(p.x, p.y, color, 34, 3.2);
+    parts.push({x:p.x,y:p.y,ring:true,r:4,life:1,decay:0.04,color:color});
+  }
+
+  function applyLevel(){
+    SPEED = BASE_SPEED * Math.pow(1.15, level);
+    lvlEl.textContent = level + 1;
+    spdEl.textContent = Math.round(Math.pow(1.15, level) * 100);
+  }
+
+  function reset() {
+    resize();
+    parts = []; shake = 0;
+    level = 0; applyLevel();
+    var cx = bar.x + bar.w/2, cy = bar.y + bar.h/2, gap = 46;
+    riders = [
+      Rider(cx - bar.w/2 - gap, cy + bar.h/2 + gap, 3, '#22e6ff', true)
+    ];
+    for (var i=0;i<3;i++) addOpponent();
+    progress = embedded ? externalProgress : 0; renderProgress();
+    score = 0; kills = 0;
+    scoreEl.textContent = '0'; distEl.textContent = '0';
+    loadBest();
+
+    labelEl.textContent = 'Загрузка системы';
+    tStart = performance.now();
+  }
+
+  function hitsWall(x,y){
+    return x < WALL || x > W - WALL || y < WALL || y > H - WALL;
+  }
+  function hitsBar(x,y){
+    return x > bar.x-2 && x < bar.x+bar.w+2 && y > bar.y-2 && y < bar.y+bar.h+2;
+  }
+  function hitsTrail(x,y,self){
+    for (var i=0;i<riders.length;i++){
+      var t = riders[i].trail;
+      var limit = (riders[i]===self) ? t.length - TRAIL_GAP : t.length - 1;
+      for (var j=0;j<limit;j++){
+        var p = t[j];
+        if (Math.abs(p.x-x) < 3 && Math.abs(p.y-y) < 3) return true;
+      }
+    }
+    return false;
+  }
+  function blocked(x,y,self){
+    return hitsWall(x,y) || hitsBar(x,y) || hitsTrail(x,y,self);
+  }
+
+  function look(r, dir, steps){
+    var d = DIRS[dir];
+    for (var i=1;i<=steps;i++){
+      if (blocked(r.x + d.x*SPEED*i, r.y + d.y*SPEED*i, r)) return i;
+    }
+    return steps + 1;
+  }
+
+  function aiThink(r){
+    var ahead = look(r, r.dir, 26);
+    if (ahead > 26 && Math.random() > 0.008) return;
+    var left = (r.dir+3)%4, right = (r.dir+1)%4;
+    var dl = look(r,left,26), dr = look(r,right,26);
+    if (ahead > 26 && dl > 26 && dr > 26) return;
+    var prev = r.dir;
+    if (dl >= dr && dl > 4) r.dir = left;
+    else if (dr > 4) r.dir = right;
+    if (r.dir !== prev) spark(r.x, r.y, r.color, 7, 1.5);
+  }
+
+  function step(){
+    for (var i=0;i<riders.length;i++){
+      var r = riders[i];
+      if (!r.alive) continue;
+      if (!r.human) aiThink(r);
+      if (r.turn){
+        r.dir = (r.dir + r.turn + 4) % 4; r.turn = 0;
+        spark(r.x, r.y, r.color, 12, 2);
+      }
+      var d = DIRS[r.dir];
+      var nx = r.x + d.x*SPEED, ny = r.y + d.y*SPEED;
+      if (blocked(nx,ny,r)) { r.alive = false; if (!r.human) kills++; explode(r.x, r.y, r.color); continue; }
+      r.x = nx; r.y = ny; r.dist += SPEED;
+      r.trail.push({x:nx,y:ny});
+      if (Math.random() < 0.25) {
+        parts.push({x:r.x,y:r.y,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,
+          life:.6,decay:0.05,color:r.color,r:0.8+Math.random()});
+      }
+    }
+    var dm = Math.round(riders[0].dist/10);
+    score = dm + kills*100 + level*50;
+    scoreEl.textContent = score;
+    distEl.textContent = dm;
+    if (score > best) { bestEl.textContent = score; }
+    var alive = 0;
+    for (var k=1;k<riders.length;k++) if (riders[k].alive) alive++;
+    aiEl.textContent = alive;
+
+  }
+
+  function drawGrid(){
+    var pulse = 0.07 + 0.05*Math.sin(tick*0.04);
+    ctx.strokeStyle = 'rgba(34,230,255,' + pulse.toFixed(3) + ')';
+    ctx.lineWidth = 1;
+    var s = 44;
+    ctx.beginPath();
+    for (var x=WALL;x<W-WALL;x+=s){ ctx.moveTo(x,WALL); ctx.lineTo(x,H-WALL); }
+    for (var y=WALL;y<H-WALL;y+=s){ ctx.moveTo(WALL,y); ctx.lineTo(W-WALL,y); }
+    ctx.stroke();
+
+    var g = 0.6 + 0.25*Math.sin(tick*0.07);
+    ctx.strokeStyle = 'rgba(34,230,255,' + g.toFixed(3) + ')';
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 14 + 10*Math.sin(tick*0.07); ctx.shadowColor = 'rgba(34,230,255,.85)';
+    ctx.strokeRect(WALL, WALL, W-WALL*2, H-WALL*2);
+    ctx.shadowBlur = 0;
+  }
+
+  function drawRider(r){
+    var t = r.trail;
+    if (t.length > 1){
+      // мягкая широкая подсветка следа
+      ctx.strokeStyle = r.color;
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.globalAlpha = 0.16 + 0.05*Math.sin(tick*0.12);
+      ctx.lineWidth = 10;
+      ctx.shadowBlur = 26; ctx.shadowColor = r.color;
+      ctx.beginPath(); ctx.moveTo(t[0].x,t[0].y);
+      for (var i=1;i<t.length;i++) ctx.lineTo(t[i].x,t[i].y);
+      ctx.stroke();
+
+      // яркое ядро
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = 3;
+      ctx.shadowBlur = 14;
+      ctx.stroke();
+
+      // белая жилка
+      ctx.strokeStyle = 'rgba(255,255,255,.55)';
+      ctx.lineWidth = 1;
+      ctx.shadowBlur = 0;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    if (r.alive){
+      ctx.fillStyle = '#fff';
+      ctx.shadowBlur = 20 + 8*Math.sin(tick*0.2); ctx.shadowColor = r.color;
+      ctx.beginPath(); ctx.arc(r.x,r.y,4.5,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  function draw(){
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    if (shake > 0.2){
+      ctx.translate((Math.random()-.5)*shake, (Math.random()-.5)*shake);
+      shake *= 0.88;
+    } else shake = 0;
+
+    ctx.clearRect(-20,-20,W+40,H+40);
+    drawBg();
+    drawGrid();
+    for (var i=0;i<riders.length;i++) drawRider(riders[i]);
+    drawParts();
+  }
+
+  function finish(){
+    state = 'over';
+    overlay.classList.remove('hidden');
+    overlay.querySelector('h1').textContent = 'Деактивирован';
+    overlay.querySelector('h1').className = 'warn';
+    var wasRecord = score > best;
+    saveBest();
+    var p = overlay.querySelector('p');
+    p.innerHTML = 'Светоцикл разбился на ' + Math.round(progress*100) + '% загрузки.<br>' +
+      'Счёт: ' + score + (wasRecord ? ' — новый рекорд!' : ' · Рекорд: ' + best) + '<br>' +
+      'Уровень: ' + (level+1) + ' · Дистанция: ' + Math.round(riders[0].dist/10) + ' м · Программ выбито: ' + kills;
+    startBtn.textContent = 'Ещё заезд';
+
+  }
+
+  function pause(){
+    state = 'pause';
+    cancelAnimationFrame(raf);
+    tPause = performance.now();
+    overlay.classList.remove('hidden');
+    overlay.querySelector('h1').textContent = 'Пауза';
+    overlay.querySelector('h1').className = '';
+    overlay.querySelector('p').innerHTML = 'Пробел — продолжить заезд.';
+    startBtn.textContent = 'Продолжить';
+  }
+
+  function resume(){
+    if (state !== 'pause') return;
+    tStart += performance.now() - tPause;
+    overlay.classList.add('hidden');
+    state = 'run';
+    raf = requestAnimationFrame(loop);
+  }
+
+  function loop(now){
+    if (state !== 'run') return;
+    tick++;
+    progress = embedded ? externalProgress : Math.min(1, (now - tStart) / loadDur);
+    var pc = Math.round(progress*100);
+    fillEl.style.width = pc + '%';
+    pctEl.textContent = pc + '%';
+
+    if (progress >= 1) labelEl.textContent = 'Игра готова · можно переходить';
+
+    // сложность: каждые 20% загрузки
+    var wantLevel = Math.min(5, Math.floor(progress*5));
+    while (level < wantLevel){
+      level++;
+      applyLevel();
+      addOpponent();
+      labelEl.textContent = 'Уровень ' + (level+1) + ' · +1 программа';
+    }
+
+    step();
+    stepParts();
+    stepBg();
+    draw();
+
+    if (!riders[0].alive) { stepParts(); draw(); return finish(); }
+    raf = requestAnimationFrame(loop);
+  }
+
+  function start(){
+    cancelAnimationFrame(raf);
+    reset();
+    overlay.classList.add('hidden');
+    state = 'run';
+    raf = requestAnimationFrame(loop);
+  }
+
+  startBtn.addEventListener('click', function(){
+    if (state === 'pause') resume(); else start();
+  });
+
+  window.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === ' ') e.preventDefault();
+    if (state === 'pause'){
+      if (e.key === ' ') resume();
+      return;
+    }
+    if (state !== 'run'){
+      if (e.key === ' ' || e.key === 'Enter') start();
+      return;
+    }
+    if (e.key === ' ') { pause(); return; }
+    if (e.key === 'ArrowLeft')  riders[0].turn = -1;
+    if (e.key === 'ArrowRight') riders[0].turn = 1;
+  });
+
+  // управление касанием: тап по левой/правой половине экрана
+  window.addEventListener('pointerdown', function(e){
+    if (state !== 'run') return;
+    riders[0].turn = (e.clientX < window.innerWidth/2) ? -1 : 1;
+  });
+
+  window.addEventListener('resize', function(){
+    resize();
+    if (state !== 'run') draw();
+  });
+
+  if (embedded) window.parent.postMessage({type: 'tron-loader-ready'}, ownerOrigin === 'null' ? '*' : ownerOrigin);
+  resize();
+  (function idle(){
+    if (!document.hidden && (state === 'menu' || state === 'over')){
+      tick++; stepBg(); stepParts(); draw();
+    }
+    requestAnimationFrame(idle);
+  })();
+})();
+</script>
+</body>
+</html>
